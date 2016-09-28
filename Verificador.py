@@ -35,28 +35,26 @@ def separaLink():
     print('Informe o caminho do arquivo Ex:(C:/usuario/documentos/links.txt)')
     caminho = input('Caminho: ')
     print('Criando arquivo com links para verificação aguarde! ...')
+    print()
+    print()
+    print()
+
     if path.isfile(caminho):
 
-        lnk = []
 
         res = open(caminho, encoding='utf8')
+        doc2 = open('links-separados.txt', 'a')
 
-        for i in range(99):
+        for i in res:
             a = res.readline()
             b = a.split('/')
             c = 'http://' + b[2] + '\n'
-            lnk.append(c)
-        res.close()
+            doc2.write(c)
 
-        doc2 = open('links-separados.txt', 'a')
-
-        a = len(lnk)
-        for i in range(99):
-            doc2.write(lnk[i])
 
         print('Arquivo criado com sucesso!')
 
-
+        res.close()
         doc2.close()
         main()
 
@@ -99,4 +97,3 @@ def verificador():
     doc2.close()
         
 main()
-
