@@ -32,7 +32,7 @@ def main():
 def separaLink():
     # Codigo para abrir arquivos em susa pastas!
 
-    #print('Informe o caminho do arquivo Ex:(c:\user\documentos\links.txt')
+    print('Informe o caminho do arquivo Ex:(C:/usuario/documentos/links.txt)')
     caminho = input('Caminho: ')
     print('Criando arquivo com links para verificação aguarde! ...')
     if path.isfile(caminho):
@@ -99,7 +99,4 @@ def verificador():
     doc2.close()
         
 main()
-"""
-#Serve para retirar o \n
-.rstrip()
-"""
+
