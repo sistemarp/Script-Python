@@ -36,10 +36,7 @@ def separaLink():
 
     print('Informe o caminho do arquivo Ex:(C:/usuario/documentos/links.txt)')
     caminho = input('Caminho: ')
-    print('Criando arquivo com links para verificação aguarde! ...')
-    print()
-    print()
-    print()
+    print('Criando arquivo com links para verificação aguarde! ...', 3*'\n')
 
     if path.isfile(caminho):
 
