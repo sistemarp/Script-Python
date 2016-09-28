@@ -21,11 +21,13 @@ def main():
         select = int(input('Escolha uma opção: '))
         if select == 1:
             separaLink()
+        elif select == 2:
+            verificador()
         else:
-            if select == 2:
-                verificador()
+            print('Selecione 1 OU 2!', 3 * '\n')
+            main()
     except:
-        print('Digite apenas números!')
+        print('Digite apenas números!', 3*'\n')
         main()
 
 
@@ -41,9 +43,9 @@ def separaLink():
 
     if path.isfile(caminho):
 
-
-        res = open(caminho, encoding='utf8')
-        doc2 = open('links-separados.txt', 'a')
+        rrr = open
+        res = open(caminho, 'r', encoding='utf8')
+        doc2 = open('links-separados.txt', 'a', encoding='utf8')
 
         for i in res:
             a = res.readline()
@@ -68,32 +70,33 @@ def separaLink():
 
 def verificador():
 
-    doc = open('links-separados.txt', 'r')
-    """
-    sites = []
-    for j in doc:
-        sites.append(j)
-    """
-    print('Verificando...')
+    with open('links-separados.txt', 'r') as doc:
 
-    doc2 = open('sitesOn.txt', 'a')
+        print('Verificando...')
 
-    for i in doc:
-        a = doc.readline()
-        z = a.rstrip()
-        link = z+'.link'
-        r = requests.get(link)
-        G = r.status_code
-        if G == 200:
-            T = requests.get(link)
-            tmp = bs4.BeautifulSoup(T.content)
-            ti = tmp.title
-            nome = str(link) + str(ti) + '\n'
-            doc2.write(nome)
+        for i in doc:
+            doc2 = open('sitesOn.txt', 'r')
+            a = doc.readline()
+            z = a.rstrip()
+            link = z + '.link'
+            r = requests.get(link)
+            G = r.status_code
 
-            print('Link: ', a.rstrip(), ' - ', ti)
+            if G == 200:
+                if z in doc2:
+                    print(a, 'Já Existe!')
 
-    doc.close()
-    doc2.close()
+                else:
+                    T = requests.get(link)
+                    tmp = bs4.BeautifulSoup(T.content)
+                    ti = tmp.title
+                    nome = str(link) + str(ti) + '\n'
+                    doc2 = open('sitesOn.txt', 'a')
+                    doc2.write(nome)
+                    doc2.close()
+                    print('Link: ', a.rstrip(), ' - ', ti)
+
+        doc.close()
+        doc2.close()
         
 main()
