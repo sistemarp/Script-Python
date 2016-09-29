@@ -15,15 +15,16 @@ from os import path
 
 
 lista2 = ['']
+contador = 0
 
 def main():
-    global lista
+    global lista, contador
     #Cria os arquivos caso não exista!
     doc2 = open('sitesOn.txt', 'a')
     doc2.close()
 
     # Codigo para abrir arquivos em susa pastas!
-    print('Informe o caminho do arquivo Ex:(C:/usuario/documentos/links.txt)')
+    print('Informe o nome do arquivo Ex: links.txt')
     local = input('Nome do arquivo: ')
     caminho = os.getcwd() + '\\' + local
     print(caminho)
@@ -56,7 +57,7 @@ def main():
             duplica(d[0])
 
 
-        print('Links online adicionados com sucesso ao documento sitesOn.txt!')
+        print('Forão adicionados mais %i novos link ao arquivo sitesOn.txt!'%contador)
 
         print('Deseja verificar mais links?', 3 * '\n')
 
@@ -94,6 +95,8 @@ def duplica(link):
 
 #Serve pra guardar os arquivos novos no arquivo!
 def verificador(endereco):
+    global contador
+
     a = endereco
     z = a.rstrip()
     link = z + '.link'
@@ -101,11 +104,12 @@ def verificador(endereco):
     G = r.status_code
 
     if G == 200:
+        contador += 1
         T = requests.get(link)
         tmp = bs4.BeautifulSoup(T.content)
         ti = tmp.title
         nome = str(link) + ' - '
-        grava = nome + str(ti) + '\n'
+        grava = endereco + str(ti) + '\n'
 
         doc2 = open('sitesOn.txt', 'a')
         doc2.write(grava)
