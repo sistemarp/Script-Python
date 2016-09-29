@@ -14,7 +14,7 @@ from os import path
 #http://www.owriezc726nuc3fv.onion/ - site <-- assim funciona!
 
 
-lista2 = ['']
+lista2 = ['0']
 contador = 0
 
 def main():
@@ -32,15 +32,16 @@ def main():
     if path.isfile(caminho):
         print('Criando arquivo com links para verificação aguarde! ...', 3 * '\n')
 
-        lista = ['']
+        lista = ['0']
 
 
         with open('sitesOn.txt', 'r') as arquivo:
 
             for l in arquivo:
                 primeiro = arquivo.readline()
-                segundo = primeiro.split('.onion')
+                segundo = primeiro.split(' ')
                 lista2.append(segundo[0])
+
 
         with open(caminho, 'r', encoding='utf8') as res:
 
@@ -49,12 +50,12 @@ def main():
                 lista.append(str(a))
 
 
-        for i in range(1, len(lista)+1):
+        for i in range(1, len(lista)):
             a = lista[i]
             b = a.split('/')
             c = 'http://' + b[2]
-            d = c.split('.onion')
-            duplica(d[0])
+            envia = c + '.link'
+            duplica(envia)
 
 
         print('Forão adicionados mais %i novos link ao arquivo sitesOn.txt!'%contador)
@@ -90,31 +91,30 @@ def duplica(link):
         return print('%s.onion - Existente!'%link)
 
     else:
-        return verificador(link+'.onion')
+        return verificador(link)
 
 
 #Serve pra guardar os arquivos novos no arquivo!
 def verificador(endereco):
     global contador
 
-    a = endereco
-    z = a.rstrip()
-    link = z + '.link'
+    link = endereco.rstrip()
     r = requests.get(link)
     G = r.status_code
 
     if G == 200:
-        contador += 1
         T = requests.get(link)
         tmp = bs4.BeautifulSoup(T.content)
         ti = tmp.title
-        nome = str(link) + ' - '
-        grava = endereco + str(ti) + '\n'
+        nome = link + ' - '
+        grava = nome + str(ti) + '\n'
+
+        contador = contador + 1
 
         doc2 = open('sitesOn.txt', 'a')
         doc2.write(grava)
         doc2.close()
-        print('Link: ', a.rstrip(), ' - ', ti)
+        print('Link: ', link.rstrip(), ' - ', ti)
 
 
 main()
