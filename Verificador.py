@@ -118,4 +118,3 @@ def verificador(endereco):
 
 
 main()
-
