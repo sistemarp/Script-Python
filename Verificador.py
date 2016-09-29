@@ -1,5 +1,6 @@
 import requests
 import bs4
+import os
 from os import path
 
 
@@ -13,87 +14,104 @@ from os import path
 #http://www.owriezc726nuc3fv.onion/ - site <-- assim funciona!
 
 
-
+lista2 = ['']
 
 def main():
-    print('(1)Selecionar arquivo C/Links (2)Verificar Links On')
-    try:
-        select = int(input('Escolha uma opção: '))
-        if select == 1:
-            separaLink()
-        elif select == 2:
-            verificador()
-        else:
-            print('Selecione 1 OU 2!', 3 * '\n')
-            main()
-    except:
-        print('Digite apenas números!', 3*'\n')
-        main()
+    global lista
+    #Cria os arquivos caso não exista!
+    doc2 = open('sitesOn.txt', 'a')
+    doc2.close()
 
-
-def separaLink():
     # Codigo para abrir arquivos em susa pastas!
-
     print('Informe o caminho do arquivo Ex:(C:/usuario/documentos/links.txt)')
-    caminho = input('Caminho: ')
-    print('Criando arquivo com links para verificação aguarde! ...', 3*'\n')
-
+    local = input('Nome do arquivo: ')
+    caminho = os.getcwd() + '\\' + local
+    print(caminho)
+    #Verifica se o arquivo existe no caminho especificado!
     if path.isfile(caminho):
+        print('Criando arquivo com links para verificação aguarde! ...', 3 * '\n')
 
-        rrr = open
-        res = open(caminho, 'r', encoding='utf8')
-        doc2 = open('links-separados.txt', 'a', encoding='utf8')
+        lista = ['']
 
-        for i in res:
-            a = res.readline()
+
+        with open('sitesOn.txt', 'r') as arquivo:
+
+            for l in arquivo:
+                primeiro = arquivo.readline()
+                segundo = primeiro.split('.onion')
+                lista2.append(segundo[0])
+
+        with open(caminho, 'r', encoding='utf8') as res:
+
+            for j in res:
+                a = res.readline()
+                lista.append(str(a))
+
+
+        for i in range(1, len(lista)+1):
+            a = lista[i]
             b = a.split('/')
-            c = 'http://' + b[2] + '\n'
-            doc2.write(c)
+            c = 'http://' + b[2]
+            d = c.split('.onion')
+            duplica(d[0])
 
 
-        print('Arquivo criado com sucesso!')
+        print('Links online adicionados com sucesso ao documento sitesOn.txt!')
+
+        print('Deseja verificar mais links?', 3 * '\n')
+
+
+
+        try:
+            opcao = str(input('(S)Sim - (N)Não: ')).lower()
+
+            if opcao == 's':
+                main()
+
+            elif opcao == 'n':
+                exit()
+        except:
+            print('Digite apenas S ou N!')
+
 
         res.close()
-        doc2.close()
         main()
 
     else:
         print('Arquivo não existe')
-        separaLink()
+        main()
+
+#Verifica se o link ja existe no arquivo!
+def duplica(link):
+    global lista2
+
+    if link in lista2:
+        return print('%s.onion - Existente!'%link)
+
+    else:
+        return verificador(link+'.onion')
 
 
+#Serve pra guardar os arquivos novos no arquivo!
+def verificador(endereco):
+    a = endereco
+    z = a.rstrip()
+    link = z + '.link'
+    r = requests.get(link)
+    G = r.status_code
 
+    if G == 200:
+        T = requests.get(link)
+        tmp = bs4.BeautifulSoup(T.content)
+        ti = tmp.title
+        nome = str(link) + ' - '
+        grava = nome + str(ti) + '\n'
 
-
-def verificador():
-
-    with open('links-separados.txt', 'r') as doc:
-
-        print('Verificando...')
-
-        for i in doc:
-            doc2 = open('sitesOn.txt', 'r')
-            a = doc.readline()
-            z = a.rstrip()
-            link = z + '.link'
-            r = requests.get(link)
-            G = r.status_code
-
-            if G == 200:
-                if z in doc2:
-                    print(a, 'Já Existe!')
-
-                else:
-                    T = requests.get(link)
-                    tmp = bs4.BeautifulSoup(T.content)
-                    ti = tmp.title
-                    nome = str(link) + str(ti) + '\n'
-                    doc2 = open('sitesOn.txt', 'a')
-                    doc2.write(nome)
-                    doc2.close()
-                    print('Link: ', a.rstrip(), ' - ', ti)
-
-        doc.close()
+        doc2 = open('sitesOn.txt', 'a')
+        doc2.write(grava)
         doc2.close()
-        
+        print('Link: ', a.rstrip(), ' - ', ti)
+
+
 main()
+
