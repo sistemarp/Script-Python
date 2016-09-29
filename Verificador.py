@@ -2,6 +2,7 @@ import requests
 import bs4
 import os
 from os import path
+import re
 
 
 #Para que o codigo funcione corretamente no arquivo link os links deve ser
@@ -43,8 +44,14 @@ def main():
                 lista2.append(segundo[0])
 
 
-        with open(caminho, 'r', encoding='utf8') as res:
+        res = open(caminho, 'r', encoding='utf8').readlines()
 
+        for link in res:
+            match = re.search('(http?\:\/\/.*?\.onion)', link.replace(' ', ''))
+            if match:
+                duplica(match.groups()[0])
+
+            """
             for j in res:
                 a = res.readline()
                 lista.append(str(a))
@@ -56,7 +63,7 @@ def main():
             c = 'http://' + b[2]
             envia = c + '.link'
             duplica(envia)
-
+            """
 
         print('Forão adicionados mais %i novos link ao arquivo sitesOn.txt!'%contador)
 
@@ -98,7 +105,8 @@ def duplica(link):
 def verificador(endereco):
     global contador
 
-    link = endereco.rstrip()
+    a = endereco.rstrip()
+    link = a + '.link'
     r = requests.get(link)
     G = r.status_code
 
@@ -118,3 +126,4 @@ def verificador(endereco):
 
 
 main()
+
