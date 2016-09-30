@@ -12,7 +12,8 @@ from os import path
 #http://www.owriezc726nuc3fv.onion/ - site <-- assim funciona!
 
 
-lista2 = ['0']
+lista1 = []
+lista2 = []
 contador = 0
 
 def main():
@@ -36,10 +37,16 @@ def main():
             for y in arquivo:
                 primeiro = arquivo.readline()
                 segundo = primeiro.split(' ')
-                lista2.append(segundo[0])
+                terceriro = segundo[0].rstrip()
+                lista1.append(terceriro)
+
+        for endereco in lista1:
+            match = re.search('(http?\:\/\/.*?\.onion)', endereco.replace(' ', ''))
+            if match:
+                lista2.append(match.groups()[0])
 
 
-        res = open(caminho, 'r', encoding='utf8').readlines()
+        res = open(caminho, 'r', encoding='utf8', errors='ignore').readlines()
 
 
         #Neste forloop serve para pegar apenas o meio do link e reescrever sem espaços
@@ -69,13 +76,16 @@ def main():
 
 #Verifica se o link ja existe no arquivo!
 def duplica(link):
-    global lista2
+    global lista1
 
-    if link in lista2:
+    if link in lista1:
         return print('%s.onion - Existente!'%link)
 
-    else:
+    elif not link in lista2:
         return verificador(link)
+
+    else:
+        print('ta dando erro ainda!')
 
 #Serve pra guardar os arquivos novos no arquivo!
 def verificador(endereco):
@@ -130,9 +140,6 @@ def gravaLink(valor, modo):
     doc2.write(grava)
     doc2.close()
     print('Link: ', valor.rstrip(), ' - ', ti)
-
-
-
 
 main()
 
