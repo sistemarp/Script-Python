@@ -1,8 +1,5 @@
-import requests
-import bs4
-import os
+import requests, bs4, os, re
 from os import path
-import re
 
 
 #Para que o codigo funcione corretamente no arquivo link os links deve ser
@@ -36,34 +33,21 @@ def main():
         lista = ['0']
 
 
-        with open('sitesOn.txt', 'r') as arquivo:
+        arquivo = open('sitesOn.txt', 'r', encoding='utf8', errors='ignore').readline()
 
-            for l in arquivo:
-                primeiro = arquivo.readline()
-                segundo = primeiro.split(' ')
-                lista2.append(segundo[0])
+        for l in arquivo:
+            segundo = arquivo.split(' ')
+            lista2.append(segundo[0])
 
 
         res = open(caminho, 'r', encoding='utf8').readlines()
 
+
+        #Neste forloop serve para pegar apenas o meio do link e reescrever sem espaços
         for link in res:
             match = re.search('(http?\:\/\/.*?\.onion)', link.replace(' ', ''))
             if match:
-                duplica(match.groups()[0])
-
-            """
-            for j in res:
-                a = res.readline()
-                lista.append(str(a))
-
-
-        for i in range(1, len(lista)):
-            a = lista[i]
-            b = a.split('/')
-            c = 'http://' + b[2]
-            envia = c + '.link'
-            duplica(envia)
-            """
+                duplica(match.groups()[0])#Envia para verificar se ta On e se ja existe no arquivo linksOn.txt
 
         print('Forão adicionados mais %i novos link ao arquivo sitesOn.txt!'%contador)
 
@@ -117,9 +101,9 @@ def verificador(endereco):
         nome = link + ' - '
         grava = nome + str(ti) + '\n'
 
-        contador = contador + 1
+        contador += 1
 
-        doc2 = open('sitesOn.txt', 'a')
+        doc2 = open('sitesOn.txt', 'a', encoding='utf8')
         doc2.write(grava)
         doc2.close()
         print('Link: ', link.rstrip(), ' - ', ti)
