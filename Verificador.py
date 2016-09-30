@@ -54,15 +54,13 @@ def main():
 
         try:
             opcao = str(input('(S)Sim - (N)Não: ')).lower()
-
             if opcao == 's':
                 main()
-
             elif opcao == 'n':
                 exit()
         except:
             print('Digite apenas S ou N!')
-
+            
         res.close()
         main()
 
