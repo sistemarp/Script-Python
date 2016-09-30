@@ -32,12 +32,11 @@ def main():
 
         lista = ['0']
 
-
-        arquivo = open('sitesOn.txt', 'r', encoding='utf8', errors='ignore').readline()
-
-        for l in arquivo:
-            segundo = arquivo.split(' ')
-            lista2.append(segundo[0])
+        with open('sitesOn.txt', 'r', encoding='utf8', errors='ignore')as arquivo:
+            for y in arquivo:
+                primeiro = arquivo.readline()
+                segundo = primeiro.split(' ')
+                lista2.append(segundo[0])
 
 
         res = open(caminho, 'r', encoding='utf8').readlines()
@@ -88,7 +87,7 @@ def verificador(endereco):
         G = r.status_code
 
         if G == 200:
-            gravaLink(link)
+            gravaLink(a, '.link')
         else:
             try:
                 a = endereco.rstrip()
@@ -97,7 +96,7 @@ def verificador(endereco):
                 G = r.status_code
 
                 if G == 200:
-                    gravaLink(link)
+                    gravaLink(a, '.to')
                 else:
                     try:
                         a = endereco.rstrip()
@@ -106,7 +105,7 @@ def verificador(endereco):
                         G = r.status_code
 
                         if G == 200:
-                            gravaLink(link)
+                            gravaLink(a, '.city')
                     except:
                         pass
             except:
@@ -115,11 +114,12 @@ def verificador(endereco):
         pass
 
 
-def gravaLink(valor):
+def gravaLink(valor, modo):
     global contador
 
-    T = requests.get(valor)
-    tmp = bs4.BeautifulSoup(T.content)
+    ver = valor + modo
+    T = requests.get(ver)
+    tmp = bs4.BeautifulSoup(T.content, "html.parser")
     ti = tmp.title
     nome = valor + ' - '
     grava = nome + str(ti) + '\n'
@@ -130,6 +130,9 @@ def gravaLink(valor):
     doc2.write(grava)
     doc2.close()
     print('Link: ', valor.rstrip(), ' - ', ti)
+
+
+
 
 main()
 
