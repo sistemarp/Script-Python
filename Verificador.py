@@ -50,10 +50,7 @@ def main():
                 duplica(match.groups()[0])#Envia para verificar se ta On e se ja existe no arquivo linksOn.txt
 
         print('Forão adicionados mais %i novos link ao arquivo sitesOn.txt!'%contador)
-
         print('Deseja verificar mais links?', 3 * '\n')
-
-
 
         try:
             opcao = str(input('(S)Sim - (N)Não: ')).lower()
@@ -65,7 +62,6 @@ def main():
                 exit()
         except:
             print('Digite apenas S ou N!')
-
 
         res.close()
         main()
@@ -83,7 +79,6 @@ def duplica(link):
 
     else:
         return verificador(link)
-
 
 #Serve pra guardar os arquivos novos no arquivo!
 def verificador(endereco):
