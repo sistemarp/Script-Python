@@ -60,7 +60,7 @@ def main():
                 exit()
         except:
             print('Digite apenas S ou N!')
-            
+
         res.close()
         main()
 
@@ -80,27 +80,56 @@ def duplica(link):
 
 #Serve pra guardar os arquivos novos no arquivo!
 def verificador(endereco):
+
+    try:
+        a = endereco.rstrip()
+        link = a + '.link'
+        r = requests.get(link)
+        G = r.status_code
+
+        if G == 200:
+            gravaLink(link)
+        else:
+            try:
+                a = endereco.rstrip()
+                link = a + '.to'
+                r = requests.get(link)
+                G = r.status_code
+
+                if G == 200:
+                    gravaLink(link)
+                else:
+                    try:
+                        a = endereco.rstrip()
+                        link = a + '.city'
+                        r = requests.get(link)
+                        G = r.status_code
+
+                        if G == 200:
+                            gravaLink(link)
+                    except:
+                        pass
+            except:
+                pass
+    except:
+        pass
+
+
+def gravaLink(valor):
     global contador
 
-    a = endereco.rstrip()
-    link = a + '.link'
-    r = requests.get(link)
-    G = r.status_code
+    T = requests.get(valor)
+    tmp = bs4.BeautifulSoup(T.content)
+    ti = tmp.title
+    nome = valor + ' - '
+    grava = nome + str(ti) + '\n'
 
-    if G == 200:
-        T = requests.get(link)
-        tmp = bs4.BeautifulSoup(T.content)
-        ti = tmp.title
-        nome = link + ' - '
-        grava = nome + str(ti) + '\n'
+    contador += 1
 
-        contador += 1
-
-        doc2 = open('sitesOn.txt', 'a', encoding='utf8')
-        doc2.write(grava)
-        doc2.close()
-        print('Link: ', link.rstrip(), ' - ', ti)
-
+    doc2 = open('sitesOn.txt', 'a', encoding='utf8', errors='ignore')
+    doc2.write(grava)
+    doc2.close()
+    print('Link: ', valor.rstrip(), ' - ', ti)
 
 main()
 
