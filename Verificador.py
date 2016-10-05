@@ -1,16 +1,8 @@
 import requests, bs4, os, re
 from os import path
 
-
-#Para que o codigo funcione corretamente no arquivo link os links deve ser
-#armazenado da seguinte forma cada link deve estar embaixo do outro!
-
-#http://www.owriezc726nuc3fv.onion/
-#http://www.owriezc726nuc3fv.onion/
-
-#site - http://www.owriezc726nuc3fv.onion/ <-- Assim não funciona
-#http://www.owriezc726nuc3fv.onion/ - site <-- assim funciona!
-
+#Programa que verifica link On na rede onion por meio de 3 nós diferentes!
+#Created By: THX
 
 lista1 = []
 lista2 = []
@@ -18,15 +10,15 @@ contador = 0
 
 def main():
     global lista, contador
-    #Cria os arquivos caso não exista!
-    doc2 = open('sitesOn.txt', 'a')
-    doc2.close()
 
     # Codigo para abrir arquivos em susa pastas!
     print('Informe o nome do arquivo Ex: links.txt')
-    local = input('Nome do arquivo: ')
-    caminho = os.getcwd() + '\\' + local
-    print(caminho)
+    local = input('Nome do arquivo de links .onion: ')
+    caminho = os.getcwd() + '\\' + local + '.txt'
+
+    #Cria arquivo sitesOn.txt caso nao exista no local!
+    if not path.isfile(caminho+'/sitesOn.txt'):
+        doc2 = open('sitesOn.txt', 'a')
     #Verifica se o arquivo existe no caminho especificado!
     if path.isfile(caminho):
         print('Criando arquivo com links para verificação aguarde! ...', 3 * '\n')
@@ -43,7 +35,8 @@ def main():
         for endereco in lista1:
             match = re.search('(http?\:\/\/.*?\.onion)', endereco.replace(' ', ''))
             if match:
-                lista2.append(match.groups()[0])
+                cr = match.groups()[0].rstrip()
+                lista2.append(cr)
 
 
         res = open(caminho, 'r', encoding='utf8', errors='ignore').readlines()
@@ -53,7 +46,8 @@ def main():
         for link in res:
             match = re.search('(http?\:\/\/.*?\.onion)', link.replace(' ', ''))
             if match:
-                duplica(match.groups()[0])#Envia para verificar se ta On e se ja existe no arquivo linksOn.txt
+                cl = match.groups()[0].rstrip()
+                duplica(cl)#Envia para verificar se ta On e se ja existe no arquivo linksOn.txt
 
         print('Forão adicionados mais %i novos link ao arquivo sitesOn.txt!'%contador)
         print('Deseja verificar mais links?', 3 * '\n')
@@ -79,13 +73,10 @@ def duplica(link):
     global lista1
 
     if link in lista1:
-        return print('%s.onion - Existente!'%link)
-
-    elif not link in lista2:
-        return verificador(link)
+        print('%s - Existente!'%link)
 
     else:
-        print('ta dando erro ainda!')
+        verificador(link)
 
 #Serve pra guardar os arquivos novos no arquivo!
 def verificador(endereco):
@@ -139,7 +130,6 @@ def gravaLink(valor, modo):
     doc2 = open('sitesOn.txt', 'a', encoding='utf8', errors='ignore')
     doc2.write(grava)
     doc2.close()
-    print('Link: ', valor.rstrip(), ' - ', ti)
+    print('Link: ', valor.rstrip(),modo , ' - ', ti)
 
 main()
-
