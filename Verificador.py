@@ -79,6 +79,7 @@ def duplica(link):
         verificador(link)
 
 #Serve pra guardar os arquivos novos no arquivo!
+#Se a resposta do server for <Response [500]> o site está Off
 def verificador(endereco):
 
     try:
@@ -86,7 +87,6 @@ def verificador(endereco):
         link = a + '.link'
         r = requests.get(link)
         G = r.status_code
-
         if G == 200:
             gravaLink(a, '.link')
         else:
@@ -108,11 +108,11 @@ def verificador(endereco):
                         if G == 200:
                             gravaLink(a, '.city')
                     except:
-                        pass
+                        print(endereco, ' -- Offline')
             except:
-                pass
+                print(endereco, ' -- Offline')
     except:
-        pass
+        print(endereco, ' -- Offline')
 
 
 def gravaLink(valor, modo):
@@ -130,6 +130,6 @@ def gravaLink(valor, modo):
     doc2 = open('sitesOn.txt', 'a', encoding='utf8', errors='ignore')
     doc2.write(grava)
     doc2.close()
-    print('Link: ', valor.rstrip(),modo , ' - ', ti)
+    print('Link: ', valor.rstrip() , ' - ', ti)
 
 main()
