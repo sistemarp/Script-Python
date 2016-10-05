@@ -108,11 +108,11 @@ def verificador(endereco):
                         if G == 200:
                             gravaLink(a, '.city')
                     except:
-                        print(endereco, ' -- Offline')
+                        print('Link:  %s -- Offline'%endereco)
             except:
-                print(endereco, ' -- Offline')
+                print('Link:  %s -- Offline' % endereco)
     except:
-        print(endereco, ' -- Offline')
+        print('Link:  %s -- Offline' % endereco)
 
 
 def gravaLink(valor, modo):
@@ -133,3 +133,4 @@ def gravaLink(valor, modo):
     print('Link: ', valor.rstrip() , ' - ', ti)
 
 main()
+
