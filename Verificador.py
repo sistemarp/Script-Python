@@ -7,15 +7,17 @@ from os import path
 #Listas serve para checar se os links ja existem!
 lista1 = []
 lista2 = []
+
 #contador server para informar quantos links forãm adicionados
 contador = 0
+
 #Dicionario armazena o nome dos arquivos que estão na pasta!
 dicionario = {}
 
 def main():
     global dicionario
     # Aqui serve para pegar o arquivo com os links!
-    
+
     print()
     print('Arquivos da pasta \n')
     imprimeLocal()
@@ -41,9 +43,10 @@ def imprimeLocal():
     inf = 0
 
     for i in range(len(arq)):
-        inf += 1
-        dicionario[inf] = arq[i]
-        print('%i: %s'%(inf, arq[i]))
+        if 'txt' in arq[i]:
+            inf += 1
+            dicionario[inf] = arq[i]
+            print('%i: %s'%(inf, arq[i]))
 
 
 def segue(lugar):
@@ -109,7 +112,7 @@ def duplica(link):
     global lista2
 
     if link in lista2:
-        print('Link: %s - Existente!'%link)
+        print('Link:  %s - Existente!'%link)
 
     elif not link in lista1:
         verificador(link)
