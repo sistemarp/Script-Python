@@ -4,15 +4,18 @@ from os import path
 #Programa que verifica link On na rede onion por meio de 3 nós diferentes!
 #Created By: THX
 
+#Listas serve para checar se os links ja existem!
 lista1 = []
 lista2 = []
+#contador server para informar quantos links forãm adicionados
 contador = 0
-
+#Dicionario armazena o nome dos arquivos que estão na pasta!
 dicionario = {}
 
 def main():
     global dicionario
-    # Codigo para abrir arquivos em susa pastas!
+    # Aqui serve para pegar o arquivo com os links!
+    
     print()
     print('Arquivos da pasta \n')
     imprimeLocal()
@@ -32,6 +35,7 @@ def main():
 
 def imprimeLocal():
     global dicionario
+    #Aqui imprime na tela os arquivos que existe na pasta
 
     arq = os.listdir()
     inf = 0
@@ -168,4 +172,3 @@ def gravaLink(valor, modo):
     print('Link: ', valor.rstrip() , ' - ', ti)
 
 main()
-
