@@ -8,13 +8,45 @@ lista1 = []
 lista2 = []
 contador = 0
 
+dicionario = {}
+
 def main():
+    global dicionario
+    # Codigo para abrir arquivos em susa pastas!
+    print()
+    print('Arquivos da pasta \n')
+    imprimeLocal()
+    print()
+    print('Informe o numero do arquivo!')
+    try:
+        acao = int(input('Infor o numero do arquivo "TXT" com os links: '))
+
+        cert = dicionario[acao]
+        tr = os.getcwd()
+        certa = tr + '/' + cert
+        segue(certa)
+
+    except:
+        print('Digite apenas o numero do arquivo')
+        main()
+
+def imprimeLocal():
+    global dicionario
+
+    arq = os.listdir()
+    inf = 0
+
+    for i in range(len(arq)):
+        inf += 1
+        dicionario[inf] = arq[i]
+        print('%i: %s'%(inf, arq[i]))
+
+
+def segue(lugar):
     global lista, contador
 
-    # Codigo para abrir arquivos em susa pastas!
-    print('Informe o nome do arquivo Ex: links.txt')
-    local = input('Nome do arquivo de links .onion: ')
-    caminho = os.getcwd() + '\\' + local + '.txt'
+    #local = input('Nome do arquivo de links .onion: ')
+    caminho = lugar
 
     #Cria arquivo sitesOn.txt caso nao exista no local!
     if not path.isfile(caminho+'/sitesOn.txt'):
@@ -70,13 +102,16 @@ def main():
 
 #Verifica se o link ja existe no arquivo!
 def duplica(link):
-    global lista1
+    global lista2
 
-    if link in lista1:
-        print('%s - Existente!'%link)
+    if link in lista2:
+        print('Link: %s - Existente!'%link)
+
+    elif not link in lista1:
+        verificador(link)
 
     else:
-        verificador(link)
+        print('Link corrompido! %s'%link)
 
 #Serve pra guardar os arquivos novos no arquivo!
 #Se a resposta do server for <Response [500]> o site está Off
