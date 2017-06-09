@@ -1,5 +1,5 @@
 # -*- coding: cp1252 -*-
-import android, pprint, time, os
+import android, time, os
 droid = android.Android()
 
 email=''
