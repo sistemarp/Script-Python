@@ -1,0 +1,90 @@
+#: import FadeTransition kivy.uix.screenmanager.FadeTransition
+#: import StringProperty kivy.properties.StringProperty
+
+ScreenManagement:
+    transition: FadeTransition()
+    MainScreen:
+    AnotherScreen:
+ 
+<Label>
+    size_hint: 1, 1
+    font_size: 12
+
+<Button>
+    size_hint: 1, 1
+    font_size: 12
+
+
+<MainScreen>:
+    pos_hint: {'center_x':.5}
+    name: 'main'
+
+    GridLayout:
+        cols: 2
+
+        Label:
+            text: 'Senha:'
+        TextInput:
+            id: senha
+            text: 'admin'
+            password: True
+
+        Button:
+            on_press: root.logarConta(senha.text)
+            text: 'Logar'
+            font_size: 12
+        Button:
+            on_release: app.root.current = 'logado'
+            text: 'Esqueci minha senha!'
+            font_size: 12         
+
+
+<AnotherScreen>:
+    name: 'logado'
+ 
+    GridLayout:
+        cols: 2
+        pos_hint: {'center_x':.5}
+
+        Label:
+            text: 'Pagina de '
+        Label:
+            text: 'configuração RTP'
+
+        Label:
+            text: 'Senha:'
+        TextInput:
+            id: sen
+            text: ''
+            password: True
+
+        Label:
+            text: 'Telefone:'
+        TextInput:
+            id: tel
+            text: ''
+
+        Label:
+            text: 'Msg para Localizar:'
+        TextInput:
+            id: loc
+            text: ''
+
+        Label:
+            text: 'Msg para Deletar SMS:'
+        TextInput:
+            id: deleta
+            text: ''
+
+        Label:
+            text: 'Msg para Resetar Confi:'
+        TextInput:
+            id: res
+            text: ''
+
+        Button:
+            text: 'Salvar'
+            on_press: root.configura(sen.text, tel.text, loc.text, deleta.text, res.text)
+        Button:
+            on_press: root.main()
+            text: 'Sair'
