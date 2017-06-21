@@ -7,11 +7,6 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.gridlayout import GridLayout
 from kivy.properties import StringProperty
 
-"""
-on_press: root.configura(sen.text, tel.text, loc.text, del.text, res.text)
-"""
-
-
 droid = android.Android()
 
 class MainScreen(Screen):
@@ -79,7 +74,6 @@ class AnotherScreen(Screen):
 
 	def main(self):
 		global phone, reset, apaga, localiza
-		print('\n\n\n\Main\n\n\n')
 		try:
 			while True:
 				#arqpath = os.sep+'storage'+os.sep+'config.txt' #Arquivo de config no celular
@@ -98,7 +92,6 @@ class AnotherScreen(Screen):
 		 
 
 	def loop(self):
-		print('no loop')
 		global localiza, apaga, reset
 		try:
 			 #path = os.sep+'storage'+os.sep+'smsid.txt' #Arquivo de config no celular
@@ -149,7 +142,6 @@ class AnotherScreen(Screen):
 			self.main()
 
 	def gps(self, smid):
-		print('no GPS *-*')
 		while True:
 			droid.toggleWifiState(True)
 			local = droid.startLocating()
@@ -166,7 +158,6 @@ class AnotherScreen(Screen):
 				return self.send(smid, latitude, longitude)
 			
 	def send(self, ss, lat, lon):
-		print('enviou')
 		global email
 		try:
 			msg='Aparelho Localizado:Latitude: %s Longitude: %s'%(str(lat), str(lon))
