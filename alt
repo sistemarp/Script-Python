@@ -1,0 +1,491 @@
+import pygame, sys, os, MySQLdb, datetime, random
+from pygame.locals import *
+
+
+class Banco(object):
+    def dados(self):
+        try:
+            conecta = MySQLdb.connect(host='localhost', user='root', passwd='toor', db='mmatriz')
+            return conecta
+        except Exception as e:
+            print('Deu erro no Banco de Dados --> ', str(e))
+
+
+class Jogo(pygame.sprite.Sprite):
+    banco = Banco().dados()
+
+    def main(self):
+        scala = (1360, 720)
+        pygame.init()
+        tela = pygame.display.set_mode(scala)#adicione pygame.FULLSCREEN para deixar full scree
+        pygame.display.set_caption('Matriz Caca Niquel')
+        frame = pygame.time.Clock()
+
+        back_ground = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + 'sob-fundo.png')
+
+        # Cria um estilo de fonte padrão para ser exibido na tela
+        style = pygame.font.get_default_font()
+        font = pygame.font.SysFont(style, 65)
+        font_pago = pygame.font.SysFont(style, 30)
+
+        credito = 0
+        premio = 0
+        aposta = 1
+        pago = 0
+        valor_aposta = 1
+        linha = 1
+
+        #cores para letras e fundos
+        cor_amarela = (196, 196, 196)
+        cor_vermelho = (240, 0, 0)
+
+        #Variaveis para inserir textos na tela
+        txt_credito = font.render(str(credito), 1, cor_amarela)
+        txt_premio = font.render(str(premio), 1, cor_amarela)
+        txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
+        txt_pago = font_pago.render(str(pago), 1, cor_amarela)
+        txt_valor_aposta = font.render(str(valor_aposta * linha), 1, cor_amarela)
+        txt_sem_credito = font_pago.render('', 1, cor_amarela)
+
+        #imagens da roleta
+        imagens = {'01': '01.jpg', '02': '02.jpg', '03': '03.jpg', '04': '04.jpg', '05': '05.jpg',
+                   '06': '06.jpg', '07': '07.jpg', '08': '08.jpg', '09': '09.jpg', '10': '10.jpg'}       
+        retencao = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
+
+        #Variavel que comtem imagens de cada rodda da roleta
+        #selecao = self.roleta(0,0)
+        #imagens pra roleta
+
+        r1 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + '01.jpg')        
+        r2 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + '02.jpg')
+        r3 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + '03.jpg')
+
+        r4 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + '04.jpg')
+        r5 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + '05.jpg')
+        r6 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + '06.jpg')
+
+        r7 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + '07.jpg')
+        r8 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + '08.jpg')
+        r9 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + '09.jpg')
+
+        r10 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + '10.jpg')
+        r11 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + '10.jpg')
+        r12 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + '10.jpg')
+
+        r13 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + '02.jpg')
+        r14 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + '02.jpg')
+        r15 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + '02.jpg')
+
+        tela_jogo= True
+        tela_config = False
+        tela_roda = False
+        tela_premio = False
+
+        gira = 0
+        while True:
+
+            if tela_jogo:
+                for event in pygame.event.get():
+                    # Captura evento QUIT que fexa o programa no X
+                    if event.type == pygame.QUIT:
+                        pygame.quit()  # Fexa o programa ao paertar no X
+                        sys.exit()  # Finaliza processos ao fexar o programa
+
+                    # Captura evento do mouse
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        print(pygame.mouse.get_pos())
+                        tela_jogo = False
+                        tela_config = True
+                                            
+
+                    # Capttura eventos do teclado
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == K_q:  # Informa qual é o evento
+                            pygame.quit()
+                            sys.exit()
+
+                        # Eventos de inserir nota
+                        if event.key == 49:
+                            credito += 200
+                            txt_credito = font.render(str(credito), 1, cor_amarela)
+                            self.salva(aposta, premio, pago, credito, valor_aposta)
+                            #self.salva('credito', str(credito))
+                        if event.key == 50:
+                            credito += 500
+                            txt_credito = font.render(str(credito), 1, cor_amarela)
+                            self.salva(aposta, premio, pago, credito, valor_aposta)
+                            #self.salva('credito', str(credito))
+                        if event.key == 51:
+                            credito += 1000
+                            txt_credito = font.render(str(credito), 1, cor_amarela)
+                            self.salva(aposta, premio, pago, credito, valor_aposta)
+                            #self.salva('credito', str(credito))
+                        if event.key == 52:
+                            credito += 2000
+                            txt_credito = font.render(str(credito), 1, cor_amarela)
+                            self.salva(aposta, premio, pago, credito, valor_aposta)
+                            #self.salva('credito', str(credito))
+                        if event.key == 53:
+                            credito += 5000
+                            txt_credito = font.render(str(credito), 1, cor_amarela)
+                            self.salva(aposta, premio, pago, credito, valor_aposta)
+                            #self.salva('credito', str(credito))
+                            
+                        # So meche na maquina com credito
+                        if credito != 0:                            
+                            #Eventos de mudar valor da aposta
+                            if event.key == 119 or 101 or 114 or 116 or 121:
+                                if event.key == 119:
+                                    valor_aposta = self.linha(1)
+                                    linha = self.linha(1)
+                                    valor_aposta = linha * aposta
+                                    txt_valor_aposta = font.render(str(linha * aposta), 1, cor_amarela)
+                                    #txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
+                                    
+                                if event.key == 101:
+                                    linha = self.linha(5)
+                                    valor_aposta = linha * aposta
+                                    txt_valor_aposta = font.render(str(linha * aposta), 1, cor_amarela)
+                                    #txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
+                                    
+                                if event.key == 114:
+                                    linha = self.linha(9)
+                                    valor_aposta = linha * aposta
+                                    txt_valor_aposta = font.render(str(linha * aposta), 1, cor_amarela)
+                                    #txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
+                                    
+                                if event.key == 116:
+                                    linha = self.linha(15)
+                                    valor_aposta = linha * aposta
+                                    txt_valor_aposta = font.render(str(linha * aposta), 1, cor_amarela)
+                                    #txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
+                                    
+                                    
+                                if event.key == 121:
+                                    linha = self.linha(25)
+                                    valor_aposta = linha * aposta
+                                    txt_valor_aposta = font.render(str(linha * aposta), 1, cor_amarela)
+                                    #txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)                            
+
+                            
+                            if aposta <= 39:
+                                # Evento de inserir aposta
+                                    
+                                # Aumenta Aposta
+                                if event.key == pygame.K_a:
+                                    if aposta <= 39:
+                                        aposta += 1
+                                        valor_aposta = linha * aposta
+                                        txt_valor_aposta = font.render(str(valor_aposta), 1, cor_amarela)
+                                        txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
+                                            
+                                #Diminui aposta
+                                if event.key == pygame.K_s:
+                                    if aposta != 1:
+                                        aposta -= 1
+                                        valor_aposta = linha * aposta
+                                        txt_valor_aposta = font.render(str(valor_aposta), 1, cor_amarela)
+                                        txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
+                                        
+                                #Gira roleta
+                                if event.key == pygame.K_g:
+                                    if valor_aposta <= credito:
+
+                                        credito -= valor_aposta
+                                        premio = 0
+                                        pago = 0
+
+                                        txt_credito = font.render(str(credito), 1, cor_amarela)
+                                        txt_premio = font.render(str(0), 1, cor_amarela)
+										txt_pago = font_pago.render(str(0), 1, cor_amarela)
+										selecao = self.roleta(aposta, linha, valor_aposta)
+										self.salva(aposta, premio, pago, credito, valor_aposta)
+                                        tela_jogo = False
+                                        tela_roda = True
+                                    else:
+                                        txt_sem_credito = font_pago.render('Não há créditos suficiente', 1, cor_vermelho)
+
+                    # Regula a frequencia de atualização da tela "Frame"
+                    frame.tick(90)
+
+                    # Imprime BackGrounds
+                    tela.blit(pygame.transform.scale(back_ground, scala), (0, 0))  # Deixa Scalavel
+
+                    # imprime Textos
+                    tela.blit(txt_credito, (335, 55))  # Imprime na tela OBS sempre apos os bcg pois imprime sequencial
+                    tela.blit(txt_aposta, (1024, 115))
+                    tela.blit(txt_premio, (704, 55))
+                    tela.blit(txt_pago, (215, 122))
+                    tela.blit(txt_valor_aposta, (1073, 55))
+                    tela.blit(txt_sem_credito, (531, 114))
+                    #imprime imagens roleta
+                    tela.blit(r1, (123, 146))
+                    tela.blit(r2, (123, 292))
+                    tela.blit(r3, (123, 439))
+                    
+                    tela.blit(r4, (345, 146))
+                    tela.blit(r5, (345, 292))
+                    tela.blit(r6, (345, 439))
+                    
+                    tela.blit(r7, (569, 146))
+                    tela.blit(r8, (569, 292))
+                    tela.blit(r9, (569, 439))
+                    
+                    tela.blit(r10, (793, 146))
+                    tela.blit(r11, (793, 292))
+                    tela.blit(r12, (793, 439))
+
+                    tela.blit(r13, (1016, 146))
+                    tela.blit(r14, (1016, 292))
+                    tela.blit(r15, (1016, 439))
+
+                    # Ativa SCLE de tela
+                    pygame.display.flip()
+
+                    # Serve para atualizar a tela a cada loop
+                    pygame.display.update()
+
+            
+            #Tela que imprime a rodada        
+            elif tela_roda:
+
+                if gira < 15:
+                    r1 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + imagens[random.choice(retencao)])        
+                    r2 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + imagens[random.choice(retencao)])
+                    r3 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + imagens[random.choice(retencao)])
+                    
+                if gira < 20:
+                    r4 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + imagens[random.choice(retencao)])
+                    r5 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + imagens[random.choice(retencao)])
+                    r6 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + imagens[random.choice(retencao)])
+                    
+                if gira < 25:
+                    r7 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + imagens[random.choice(retencao)])
+                    r8 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + imagens[random.choice(retencao)])
+                    r9 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + imagens[random.choice(retencao)])
+                    
+                if gira < 30:
+                    r10 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + imagens[random.choice(retencao)])
+                    r11 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + imagens[random.choice(retencao)])
+                    r12 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + imagens[random.choice(retencao)])
+
+                r13 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + imagens[random.choice(retencao)])
+                r14 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + imagens[random.choice(retencao)])
+                r15 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + imagens[random.choice(retencao)])
+
+                
+                
+                if gira == 15:
+                    r1 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + selecao[0])
+                    r2 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + selecao[1])
+                    r3 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + selecao[2])
+
+                if gira == 20:
+                    r4 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + selecao[3])
+                    r5 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + selecao[4])
+                    r6 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + selecao[5])
+
+                if gira == 25:
+                    r7 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + selecao[6])
+                    r8 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + selecao[7])
+                    r9 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + selecao[8])
+
+                if gira == 30:
+                    r10 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + selecao[9])
+                    r11 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + selecao[10])
+                    r12 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + selecao[11])
+
+                if gira == 35:
+                    gira = 0
+                    
+                    r13 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + selecao[12])
+                    r14 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + selecao[13])
+                    r15 = pygame.image.load(os.getcwd() + os.sep + '_imagens' + os.sep + selecao[14])
+            
+                    tela_jogo = True
+                    tela_roda = False
+                    
+                gira += 1
+                    
+                frame.tick(90)
+                #Imprime na tela 
+                tela.blit(r1, (123, 146))
+                tela.blit(r2, (123, 292))
+                tela.blit(r3, (123, 439))
+                    
+                tela.blit(r4, (345, 146))
+                tela.blit(r5, (345, 292))
+                tela.blit(r6, (345, 439))
+                    
+                tela.blit(r7, (569, 146))
+                tela.blit(r8, (569, 292))
+                tela.blit(r9, (569, 439))
+                    
+                tela.blit(r10, (793, 146))
+                tela.blit(r11, (793, 292))
+                tela.blit(r12, (793, 439))
+
+                tela.blit(r13, (1016, 146))
+                tela.blit(r14, (1016, 292))
+                tela.blit(r15, (1016, 439))
+                
+                pygame.display.flip()
+                pygame.display.update()
+            
+            elif tela_config:
+                
+                for event in pygame.event.get():
+                    cor_amarela = (196, 196, 196)
+                    txt_cfg = font.render(str('tela de config'), 1, cor_amarela)
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_j:
+                            tela_jogo = True
+                            tela_config = False
+                                    
+                    frame.tick(30)
+                    tela.blit(pygame.transform.scale(back_ground, scala), (0, 0))  # Deixa Scalavel
+
+                    tela.blit(txt_cfg, (0,0))
+
+                    # Ativa SCLE de tela
+                    pygame.display.flip()
+                    
+                    # Serve para atualizar a tela a cada loop
+                    pygame.display.update()
+                    
+
+    #define em qual linha o ojador quer
+    def linha(self, tipo):
+        if tipo == 1:
+            return 1
+        if tipo == 5:
+            return 5
+        if tipo == 9:
+            return 9
+        if tipo == 15:
+            return 15
+        if tipo == 25:
+            return 25
+        
+
+                
+    def roleta(self, aposta, linhas, apValor):
+        data = self.banco
+        var = "SELECT reten FROM user WHERE usuario = 'admin'"
+        ex = data.cursor()
+        ex.execute(var)
+
+        #Pega Valor do Banco par informar o valor a reter
+        RET = ex.fetchall()[0][0]
+
+        #referencia da imagens da roleta
+        imagens = {'01': '01.jpg', '02': '02.jpg', '03': '03.jpg', '04': '04.jpg', '05': '05.jpg', '06': '06.jpg', '07': '07.jpg',
+                   '08': '08.jpg', '09': '09.jpg', '10': '10.jpg' }
+
+        #Lista com valores para sorteio quanto mais numero maior a retenção
+        retencao = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
+
+        print(linhas, apValor)
+
+        if RET > 1:
+            for add in range(int(RET)):
+                retencao.append('03')
+                retencao.append('04')
+                retencao.append('05')
+                retencao.append('06')
+                retencao.append('07')
+                retencao.append('08')
+                retencao.append('09')
+                retencao.append('10')
+
+        img = []
+
+        col1 = []
+        col2 = []
+        col3 = []
+        col4 = []
+        col5 = []
+
+        for i in range(1, 16):
+        	esc = random.choice(retencao)
+        	img.append(imagens[esc])
+        	if i < 4:
+        		col1.append(esc)
+
+        	elif i < 7:
+        		col2.append(esc)
+
+        	elif i < 10:
+        		col3.append(esc)
+
+        	elif i < 13:
+        		col4.append(esc)
+
+        	else:
+        		col5.append(esc)
+
+
+        if img[0] == col1[0] and col1[1] and col1[2]:
+        	print('ganhou')
+        	credito += valores(img[0])
+        	premio = valores(img[0])
+        	pago = valores(img[0])
+        	txt_premio = font.render(str(premio), 1, cor_amarela)
+			txt_pago = font_pago.render(str(pago), 1, cor_amarela)
+
+       	if img[3] == col2[0] and col2[1] and col2[2]:
+        	print('ganhou')
+        	credito += valores(img[0])
+        	premio = valores(img[0])
+        	pago = valores(img[0])
+        	txt_premio = font.render(str(premio), 1, cor_amarela)
+			txt_pago = font_pago.render(str(pago), 1, cor_amarela)
+
+        if img[6] == col3[0] and col3[1] and col3[2]:
+        	print('ganhou')
+        	credito += valores(img[0])
+        	premio = valores(img[0])
+        	pago = valores(img[0])
+        	txt_premio = font.render(str(premio), 1, cor_amarela)
+			txt_pago = font_pago.render(str(pago), 1, cor_amarela)
+
+        if img[9] == col4[0] and col4[1] and col4[2]:
+        	print('ganhou')
+        	credito += valores(img[0])
+        	premio = valores(img[0])
+        	pago = valores(img[0])
+        	txt_premio = font.render(str(premio), 1, cor_amarela)
+			txt_pago = font_pago.render(str(pago), 1, cor_amarela)
+
+        if img[12] == col5[0] and col5[1] and col5[2]:
+        	print('ganhou')
+        	credito += valores(img[0])
+        	premio = valores(img[0])
+        	pago = valores(img[0])
+        	txt_premio = font.render(str(premio), 1, cor_amarela)
+			txt_pago = font_pago.render(str(pago), 1, cor_amarela)
+
+
+        print(img)
+            
+        return img
+
+    def salva(self, ap, pr, pa, cr, va):
+        data = self.banco
+        relogio = str(datetime.datetime.now()).split('.')[0]
+        hora = relogio
+        # Salva ultimo estado do credito da maquina
+        #if tipo == 'credito':
+        var = "INSERT INTO ultima_aposta (id, B_aposta, B_premio, B_pago, B_credito, B_valor_aposta, data) VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s');" % (ap, pr, pa, cr, va, hora)
+        grava = data.cursor()
+        grava.execute(var)
+        data.commit()
+
+    def valores(self, carta):
+    	imagens = {'01.jpg': 500,'02.jpg': 300, '03.jpg': 40, '04.jpg': 30, '05.jpg': 20, '06.jpg': 15, '07.jpg': 10,
+                   '08.jpg': 8, '09.jpg': 6, '10.jpg': 2 }
+
+        return imagens[carta]
+
+if __name__ == '__main__':
+    Jogo().main()
