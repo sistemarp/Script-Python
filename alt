@@ -3,725 +3,2084 @@ from pygame.locals import *
 
 
 class Banco(object):
-                def dados(self):
-                                try:
-                                                conecta = MySQLdb.connect(host='localhost', user='root', passwd='toor', db='mmatriz')
-                                                return conecta
-                                except Exception as e:
-                                                print('Deu erro no Banco de Dados --> ', str(e))
+	def dados(self):
+		try:
+			conecta = MySQLdb.connect(host='localhost', user='root', passwd='toor', db='mmatriz')
+			return conecta
+		except Exception as e:
+			print('Deu erro no Banco de Dados --> ', str(e))
 
 
 class Jogo(pygame.sprite.Sprite):
-                banco = Banco().dados()
-                retencao = 0
-                premiacao = ''
-
-                def main(self):
-                                scala = (1360, 720)
-                                pygame.init()
-                                tela = pygame.display.set_mode(scala)#adicione pygame.FULLSCREEN para deixar full scree
-                                pygame.display.set_caption('Matriz Caca Niquel')
-                                frame = pygame.time.Clock()
-
-                                local = os.getcwd() + os.sep + '_imagens' + os.sep
-
-                                back_ground = pygame.image.load(local + 'sob-fundo.png')
-                                bonus_garrafa = pygame.image.load(local + 'bonus_garrafa.jpg')
-
-                                # Cria um estilo de fonte padrão para ser exibido na tela
-                                style = pygame.font.get_default_font()
-                                font = pygame.font.SysFont(style, 65)
-                                font_pago = pygame.font.SysFont(style, 30)
-
-                                credito = 0
-                                premio = 0
-                                aposta = 1
-                                pago = 0
-                                valor_aposta = 1
-                                linha = 1
-                                divi = ''
-
-                                premiacao = {}
-
-                                #cores para letras e fundos
-                                cor_amarela = (196, 196, 196)
-                                cor_vermelho = (240, 0, 0)
-
-                                #Variaveis para inserir textos na tela
-                                txt_credito = font.render(str(credito), 1, cor_amarela)
-                                txt_premio = font.render(str(premio), 1, cor_amarela)
-                                txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
-                                txt_pago = font_pago.render(str(pago), 1, cor_amarela)
-                                txt_valor_aposta = font.render(str(valor_aposta * linha), 1, cor_amarela)
-                                txt_sem_credito = font_pago.render('', 1, cor_amarela)
-
-                                #imagens da roleta
-                                imagens = {'01': '01.jpg', '02': '02.jpg', '03': '03.jpg', '04': '04.jpg', '05': '05.jpg',
-                                                                   '06': '06.jpg', '07': '07.jpg', '08': '08.jpg', '09': '09.jpg', '10': '10.jpg'}
-                                retencao = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
-
-                                #Variavel que comtem imagens de cada rodda da roleta
-                                #selecao = self.roleta(0,0)
-                                #imagens pra roleta
-
-                                r1 = pygame.image.load(local + '01.jpg')
-                                r2 = pygame.image.load(local + '02.jpg')
-                                r3 = pygame.image.load(local + '03.jpg')
-
-                                r4 = pygame.image.load(local + '04.jpg')
-                                r5 = pygame.image.load(local + '05.jpg')
-                                r6 = pygame.image.load(local + '06.jpg')
-
-                                r7 = pygame.image.load(local + '07.jpg')
-                                r8 = pygame.image.load(local + '08.jpg')
-                                r9 = pygame.image.load(local + '09.jpg')
-
-                                r10 = pygame.image.load(local + '10.jpg')
-                                r11 = pygame.image.load(local + '10.jpg')
-                                r12 = pygame.image.load(local + '10.jpg')
-
-                                r13 = pygame.image.load(local + '02.jpg')
-                                r14 = pygame.image.load(local + '02.jpg')
-                                r15 = pygame.image.load(local + '02.jpg')
-
-                                tela_jogo= True
-                                tela_config = False
-                                tela_roda = False
-                                tela_premio = False
-                                b_bruxa = False
-                                b_sinuca = False
-                                b_redbull = False
-                                tela_pagamento = False
-                                tela_premiacao = False
-
-                                gira = 0
-                                tm = 0
-                                while True:
-
-                                                if tela_jogo:
-                                                                for event in pygame.event.get():
-                                                                                # Captura evento QUIT que fexa o programa no X
-                                                                                if event.type == pygame.QUIT:
-                                                                                                pygame.quit()  # Fexa o programa ao paertar no X
-                                                                                                sys.exit()  # Finaliza processos ao fexar o programa
-
-                                                                                # Captura evento do mouse
-                                                                                if event.type == pygame.MOUSEBUTTONDOWN:
-                                                                                                print(pygame.mouse.get_pos())
-                                                                                                tela_jogo = False
-                                                                                                tela_config = True
-
-
-                                                                                # Capttura eventos do teclado
-                                                                                if event.type == pygame.KEYDOWN:
-                                                                                                if event.key == K_q:  # Informa qual é o evento
-                                                                                                                pygame.quit()
-                                                                                                                sys.exit()
-
-                                                                                                # Eventos de inserir nota
-                                                                                                if event.key == 49:
-                                                                                                                credito += 200
-                                                                                                                txt_credito = font.render(str(credito), 1, cor_amarela)
-                                                                                                                self.salva(aposta, premio, pago, credito, valor_aposta)
-                                                                                                                #self.salva('credito', str(credito))
-                                                                                                if event.key == 50:
-                                                                                                                credito += 500
-                                                                                                                txt_credito = font.render(str(credito), 1, cor_amarela)
-                                                                                                                self.salva(aposta, premio, pago, credito, valor_aposta)
-                                                                                                                #self.salva('credito', str(credito))
-                                                                                                if event.key == 51:
-                                                                                                                credito += 1000
-                                                                                                                txt_credito = font.render(str(credito), 1, cor_amarela)
-                                                                                                                self.salva(aposta, premio, pago, credito, valor_aposta)
-                                                                                                                #self.salva('credito', str(credito))
-                                                                                                if event.key == 52:
-                                                                                                                credito += 2000
-                                                                                                                txt_credito = font.render(str(credito), 1, cor_amarela)
-                                                                                                                self.salva(aposta, premio, pago, credito, valor_aposta)
-                                                                                                                #self.salva('credito', str(credito))
-                                                                                                if event.key == 53:
-                                                                                                                credito += 5000
-                                                                                                                txt_credito = font.render(str(credito), 1, cor_amarela)
-                                                                                                                self.salva(aposta, premio, pago, credito, valor_aposta)
-                                                                                                                #self.salva('credito', str(credito))
-
-                                                                                                # So meche na maquina com credito
-                                                                                                if credito != 0:
-                                                                                                                #Eventos de mudar valor da aposta
-                                                                                                                if event.key == 119 or 101 or 114 or 116 or 121:
-                                                                                                                                if event.key == 119:
-                                                                                                                                                valor_aposta = self.linha(1)
-                                                                                                                                                linha = self.linha(1)
-                                                                                                                                                valor_aposta = linha * aposta
-                                                                                                                                                txt_valor_aposta = font.render(str(linha * aposta), 1, cor_amarela)
-                                                                                                                                                #txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
-
-                                                                                                                                if event.key == 101:
-                                                                                                                                                linha = self.linha(5)
-                                                                                                                                                valor_aposta = linha * aposta
-                                                                                                                                                txt_valor_aposta = font.render(str(linha * aposta), 1, cor_amarela)
-                                                                                                                                                #txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
-
-                                                                                                                                if event.key == 114:
-                                                                                                                                                linha = self.linha(9)
-                                                                                                                                                valor_aposta = linha * aposta
-                                                                                                                                                txt_valor_aposta = font.render(str(linha * aposta), 1, cor_amarela)
-                                                                                                                                                #txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
-
-                                                                                                                                if event.key == 116:
-                                                                                                                                                linha = self.linha(15)
-                                                                                                                                                valor_aposta = linha * aposta
-                                                                                                                                                txt_valor_aposta = font.render(str(linha * aposta), 1, cor_amarela)
-                                                                                                                                                #txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
-
-
-                                                                                                                                if event.key == 121:
-                                                                                                                                                linha = self.linha(25)
-                                                                                                                                                valor_aposta = linha * aposta
-                                                                                                                                                txt_valor_aposta = font.render(str(linha * aposta), 1, cor_amarela)
-                                                                                                                                                #txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
-
-
-                                                                                                                if aposta <= 40:
-                                                                                                                                # Evento de inserir aposta
-
-                                                                                                                                # Aumenta Aposta
-                                                                                                                                if event.key == pygame.K_a:
-                                                                                                                                                if aposta <= 39:
-                                                                                                                                                                aposta += 1
-                                                                                                                                                                valor_aposta = linha * aposta
-                                                                                                                                                                txt_valor_aposta = font.render(str(valor_aposta), 1, cor_amarela)
-                                                                                                                                                                txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
-
-                                                                                                                                #Diminui aposta
-                                                                                                                                if event.key == pygame.K_s:
-                                                                                                                                                if aposta != 1:
-                                                                                                                                                                aposta -= 1
-                                                                                                                                                                valor_aposta = linha * aposta
-                                                                                                                                                                txt_valor_aposta = font.render(str(valor_aposta), 1, cor_amarela)
-                                                                                                                                                                txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
-
-                                                                                                                                #Gira roleta
-                                                                                                                                if event.key == pygame.K_g:
-                                                                                                                                                if valor_aposta <= credito:
-
-                                                                                                                                                                credito -= valor_aposta
-                                                                                                                                                                premio = 0
-                                                                                                                                                                pago = 0
-
-                                                                                                                                                                txt_credito = font.render(str(credito), 1, cor_amarela)
-                                                                                                                                                                txt_premio = font.render(str(0), 1, cor_amarela)
-                                                                                                                                                                txt_pago = font_pago.render(str(0), 1, cor_amarela)
-                                                                                                                                                                divi = self.roleta(aposta, linha, valor_aposta)
-                                                                                                                                                                selecao = divi[0]
-                                                                                                                                                                if divi[1] != None:
-                                                                                                                                                                                premiacao = divi[1][0]
-                                                                                                                                                                self.salva(aposta, premio, pago, credito, valor_aposta)
-                                                                                                                                                                tela_jogo = False
-                                                                                                                                                                tela_roda = True
-                                                                                                                                                else:
-                                                                                                                                                                txt_sem_credito = font_pago.render('Não há créditos suficiente', 1, cor_vermelho)
-
-                                                                                # Regula a frequencia de atualização da tela "Frame"
-                                                                                frame.tick(60)
-
-                                                                                # Imprime BackGrounds
-                                                                                tela.blit(pygame.transform.scale(back_ground, scala), (0, 0))  # Deixa Scalavel
-
-                                                                                # imprime Textos
-                                                                                tela.blit(txt_credito, (335, 55))  # Imprime na tela OBS sempre apos os bcg pois imprime sequencial
-                                                                                tela.blit(txt_aposta, (1024, 115))
-                                                                                tela.blit(txt_premio, (704, 55))
-                                                                                tela.blit(txt_pago, (215, 122))
-                                                                                tela.blit(txt_valor_aposta, (1073, 55))
-                                                                                tela.blit(txt_sem_credito, (531, 114))
-                                                                                #imprime imagens roleta
-                                                                                tela.blit(r1, (123, 146))
-                                                                                tela.blit(r2, (123, 292))
-                                                                                tela.blit(r3, (123, 439))
-
-                                                                                tela.blit(r4, (345, 146))
-                                                                                tela.blit(r5, (345, 292))
-                                                                                tela.blit(r6, (345, 439))
-
-                                                                                tela.blit(r7, (569, 146))
-                                                                                tela.blit(r8, (569, 292))
-                                                                                tela.blit(r9, (569, 439))
-
-                                                                                tela.blit(r10, (793, 146))
-                                                                                tela.blit(r11, (793, 292))
-                                                                                tela.blit(r12, (793, 439))
-
-                                                                                tela.blit(r13, (1016, 146))
-                                                                                tela.blit(r14, (1016, 292))
-                                                                                tela.blit(r15, (1016, 439))
-
-                                                                                # Ativa SCLE de tela
-                                                                                pygame.display.flip()
-
-                                                                                # Serve para atualizar a tela a cada loop
-                                                                                pygame.display.update()
-
-
-                                                #Tela que imprime a rodada
-                                                elif tela_roda:
-
-                                                                if gira < 15:
-                                                                        r1 = pygame.image.load(local + imagens[random.choice(retencao)])
-                                                                        r2 = pygame.image.load(local + imagens[random.choice(retencao)])
-                                                                        r3 = pygame.image.load(local + imagens[random.choice(retencao)])
-
-                                                                if gira < 20:
-                                                                        r4 = pygame.image.load(local + imagens[random.choice(retencao)])
-                                                                        r5 = pygame.image.load(local + imagens[random.choice(retencao)])
-                                                                        r6 = pygame.image.load(local + imagens[random.choice(retencao)])
-
-                                                                if gira < 25:
-                                                                        r7 = pygame.image.load(local + imagens[random.choice(retencao)])
-                                                                        r8 = pygame.image.load(local + imagens[random.choice(retencao)])
-                                                                        r9 = pygame.image.load(local + imagens[random.choice(retencao)])
-
-                                                                if gira < 30:
-                                                                        r10 = pygame.image.load(local + imagens[random.choice(retencao)])
-                                                                        r11 = pygame.image.load(local + imagens[random.choice(retencao)])
-                                                                        r12 = pygame.image.load(local + imagens[random.choice(retencao)])
-
-                                                                if gira < 35:
-                                                                        r13 = pygame.image.load(local + imagens[random.choice(retencao)])
-                                                                        r14 = pygame.image.load(local + imagens[random.choice(retencao)])
-                                                                        r15 = pygame.image.load(local + imagens[random.choice(retencao)])
-
-
-
-                                                                if gira == 15:
-                                                                        r1 = pygame.image.load(local + selecao[0])
-                                                                        r2 = pygame.image.load(local + selecao[1])
-                                                                        r3 = pygame.image.load(local + selecao[2])
-
-                                                                if gira == 20:
-                                                                        r4 = pygame.image.load(local + selecao[3])
-                                                                        r5 = pygame.image.load(local + selecao[4])
-                                                                        r6 = pygame.image.load(local + selecao[5])
-
-                                                                if gira == 25:
-                                                                        r7 = pygame.image.load(local + selecao[6])
-                                                                        r8 = pygame.image.load(local + selecao[7])
-                                                                        r9 = pygame.image.load(local + selecao[8])
-
-                                                                if gira == 30:
-                                                                        r10 = pygame.image.load(local + selecao[9])
-                                                                        r11 = pygame.image.load(local + selecao[10])
-                                                                        r12 = pygame.image.load(local + selecao[11])
-
-                                                                if gira == 35:
-                                                                        gira = 0
-                                                                        r13 = pygame.image.load(local + selecao[12])
-                                                                        r14 = pygame.image.load(local + selecao[13])
-                                                                        r15 = pygame.image.load(local + selecao[14])
-
-                                                                        if premiacao == {}:
-                                                                                tela_jogo = True
-                                                                                tela_roda = False
-
-                                                                        if premiacao != {}:
-                                                                                tela_premiacao = True
-                                                                                for pr in premiacao.keys():
-                                                                                        premio += premiacao[pr]
-
-                                                                                pago = premio
-                                                                                credito += premio
-                                                                                premiacao = {}
-
-                                                                                txt_credito = font.render(str(credito), 1, cor_amarela)
-                                                                                txt_premio = font.render(str(premio), 1, cor_amarela)
-                                                                                txt_pago = font_pago.render(str(pago), 1, cor_amarela)
-
-                                                                                if divi[1][1] != '':
-                                                                                        if divi[1][1] == 'bruxa':
-                                                                                                b_bruxa = True
-                                                                                                tela_roda = False
-
-                                                                                        if divi[1][1] == 'sinuca':
-                                                                                                b_sinuca = True
-                                                                                                tela_roda = False
-
-                                                                                        if divi[1][1] == 'redbull':
-                                                                                                b_redbull = True
-                                                                                                tela_roda = False
-
-                                                                                else:
-                                                                                        tela_premiacao = True
-                                                                                        tela_roda = False
-
-                                                                gira += 1
-
-                                                                frame.tick(60)
-                                                                #Imprime na tela
-                                                                tela.blit(r1, (123, 146))
-                                                                tela.blit(r2, (123, 292))
-                                                                tela.blit(r3, (123, 439))
-
-                                                                tela.blit(r4, (345, 146))
-                                                                tela.blit(r5, (345, 292))
-                                                                tela.blit(r6, (345, 439))
-
-                                                                tela.blit(r7, (569, 146))
-                                                                tela.blit(r8, (569, 292))
-                                                                tela.blit(r9, (569, 439))
-
-                                                                tela.blit(r10, (793, 146))
-                                                                tela.blit(r11, (793, 292))
-                                                                tela.blit(r12, (793, 439))
-
-                                                                tela.blit(r13, (1016, 146))
-                                                                tela.blit(r14, (1016, 292))
-                                                                tela.blit(r15, (1016, 439))
-
-                                                                pygame.display.flip()
-                                                                pygame.display.update()
-
-                                                elif tela_premiacao:
-                                                	print(premiacao)
-                                                        #for pr in premiacao[0].keys():
-                                                        #    print(pr)
-
-                                                elif b_sinuca:
-                                                        print('sinuca')
-                                                        tela_jogo = True
-                                                        b_sinuca = False
-
-                                                elif b_redbull:
-                                                    if tm < 1:
-                                                        tm += 1
-                                                        pygame.time.wait(1000)
-
-                                                    for event in pygame.event.get():
-                                                        if event.type == pygame.KEYDOWN:
-                                                            if event.key == pygame.K_w:
-                                                                print(self.bonus(10))
-                                                                print('escolheu 1')
-                                                                tm = 0
-                                                                tela_jogo = True
-                                                                b_redbull = False
-
-                                                        frame.tick(30)
-                                                        tela.blit(pygame.transform.scale(bonus_garrafa, scala), (0, 0))
-                                                        pygame.display.update()
-
-                                                elif b_bruxa:
-                                                        print('bruxa')
-                                                        tela_jogo = True
-                                                        b_bruxa = False
-
-                                                elif tela_pagamento:
-                                                        pass
-
-
-
-                                                elif tela_config:
-
-                                                                for event in pygame.event.get():
-                                                                                cor_amarela = (196, 196, 196)
-                                                                                txt_cfg = font.render(str('tela de config'), 1, cor_amarela)
-                                                                                if event.type == pygame.KEYDOWN:
-                                                                                                if event.key == pygame.K_j:
-                                                                                                                tela_jogo = True
-                                                                                                                tela_config = False
-
-                                                                                frame.tick(30)
-                                                                                tela.blit(pygame.transform.scale(bonus_garrafa, scala), (0, 0))  # Deixa Scalavel
-
-                                                                                tela.blit(txt_cfg, (0,0))
-
-                                                                                # Ativa SCLE de tela
-                                                                                pygame.display.flip()
-
-                                                                                # Serve para atualizar a tela a cada loop
-                                                                                pygame.display.update()
-
-
-                #define em qual linha o ojador quer
-                def linha(self, tipo):
-                                if tipo == 1:
-                                                return 1
-                                if tipo == 5:
-                                                return 5
-                                if tipo == 9:
-                                                return 9
-                                if tipo == 15:
-                                                return 15
-                                if tipo == 25:
-                                                return 25
-
-                def bonus(self, val):
-                    RETEN = [500, 150, 100, 75, 50, 25]
-                    for i in range(self.retencao):
-                            RETEN.append(100)
-                            RETEN.append(75)
-                            RETEN.append(50)
-                            RETEN.append(25)
-                                                        
-                    return random.choice(RETEN)
-
-
-
-                def roleta(self, aposta, linhas, apValor):
-                                data = self.banco
-                                var = "SELECT reten FROM user WHERE usuario = 'admin'"
-                                ex = data.cursor()
-                                ex.execute(var) 
-
-                                #Pega Valor do Banco par informar o valor a reter
-                                RET = ex.fetchall()[0][0]
-                                self.retencao = RET
-
-                                #referencia da imagens da roleta
-                                imagens = {'01': '01.jpg', '02': '02.jpg', '03': '03.jpg', '04': '04.jpg', '05': '05.jpg', '06': '06.jpg', '07': '07.jpg',
-                                                                   '08': '08.jpg', '09': '09.jpg', '10': '10.jpg' }
-
-                                #Lista com valores para sorteio quanto mais numero maior a retenção
-                                retencao = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
-
-                                if RET > 1:
-                                                for add in range(int(RET)):
-                                                                #retencao.append('03')
-                                                                #retencao.append('04')
-                                                                retencao.append('05')
-                                                                #retencao.append('06')
-                                                                #retencao.append('07')
-                                                                #retencao.append('08')
-                                                                #retencao.append('09')
-                                                                #retencao.append('10')
-
-                                img = []
-
-                                listagen = {}
-                                for i in range(1, 16):
-                                                rand = imagens[random.choice(retencao)]
-                                                img.append(rand)
-                                                r = 'l'+str(i)
-                                                listagen[r] = rand
-
-                                verifica_premios = ''
-
-                                if linhas == 25:
-                                                verifica_premios = self.linha25(listagen, apValor)
-
-                                if linhas == 15:
-                                                verifica_premios = self.linha15(listagen)
-
-                                if linhas == 9:
-                                                verifica_premios = self.linha9(listagen)
-
-                                if linhas == 5:
-                                                verifica_premios = self.linha5(listagen)
-
-                                if linhas == 1:
-                                                verifica_premios = self.linha1(listagen)
-
-                                return img, verifica_premios
-
-                def salva(self, ap, pr, pa, cr, va):
-                                data = self.banco
-                                relogio = str(datetime.datetime.now()).split('.')[0]
-                                hora = relogio
-                                # Salva ultimo estado do credito da maquina
-                                #if tipo == 'credito':
-                                var = "INSERT INTO ultima_aposta (id, B_aposta, B_premio, B_pago, B_credito, B_valor_aposta, data) VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s');" % (ap, pr, pa, cr, va, hora)
-                                grava = data.cursor()
-                                grava.execute(var)
-                                data.commit()
-
-
-                def linha25(self, rolos, val):
-                                imagens = {'01.jpg': 500,'02.jpg': 300, '03.jpg': 40, '04.jpg': 30, '05.jpg': 20, '06.jpg': 15, '07.jpg': 10,
-                                                                   '08.jpg': 8, '09.jpg': 6, '10.jpg': 2 }
-
-                                valor_ganho = 0
-                                bonus = ''
-                                wins = {}
-                                #Premio vertical por coluna
-                                if rolos['l1'] == rolos['l2']:
-                                                if rolos['l1'] == rolos['l3']:
-                                                                valor_ganho += 3 * imagens[rolos['l1']] + int(25 * val / 100)
-                                                                wins['l1'] = valor_ganho
-                                                                if rolos['l1'] == '09.jpg':
-                                                                                bonus = 'bruxa'
-                                                                elif rolos['l1'] == '08.jpg':
-                                                                                bonus = 'sinuca'
-                                                                elif rolos['l1'] == '05.jpg':
-                                                                                bonus = 'redbull'
-
-                                if rolos['l4'] == rolos['l5']:
-                                                if rolos['l4'] == rolos['l6']:
-                                                                valor_ganho += 3 * imagens[rolos['l4']] + int(25 * val / 100)
-                                                                wins['l4'] = valor_ganho
-                                                                if rolos['l4'] == '09.jpg':
-                                                                                bonus = 'bruxa'
-                                                                elif rolos['l4'] == '08.jpg':
-                                                                                bonus = 'sinuca'
-                                                                elif rolos['l4'] == '05.jpg':
-                                                                                bonus = 'redbull'
-
-                                if rolos['l7'] == rolos['l8']:
-                                                if rolos['l7'] == rolos['l9']:
-                                                                valor_ganho += 3 * imagens[rolos['l7']] + int(25 * val / 100)
-                                                                wins['l7'] = valor_ganho
-                                                                if rolos['l7'] == '09.jpg':
-                                                                                bonus = 'bruxa'
-                                                                elif rolos['l7'] == '08.jpg':
-                                                                                bonus = 'sinuca'
-                                                                elif rolos['l7'] == '05.jpg':
-                                                                                bonus = 'redbull'
-
-                                if rolos['l10'] == rolos['l11']:
-                                                if rolos['l10'] == rolos['l12']:
-                                                                valor_ganho += 3 * imagens[rolos['l10']] + int(25 * val / 100)
-                                                                wins['l10'] = valor_ganho
-                                                                if rolos['l10'] == '09.jpg':
-                                                                                bonus = 'bruxa'
-                                                                elif rolos['l10'] == '08.jpg':
-                                                                                bonus = 'sinuca'
-                                                                elif rolos['l10'] == '05.jpg':
-                                                                                bonus = 'redbull'
-
-                                if rolos['l13'] == rolos['l14']:
-                                                if rolos['l13'] == rolos['l15']:
-                                                                valor_ganho += 3 * imagens[rolos['l13']] + int(25 * val / 100)
-                                                                wins['l15'] = valor_ganho
-                                                                if rolos['l13'] == '09.jpg':
-                                                                                bonus = 'bruxa'
-                                                                elif rolos['l13'] == '08.jpg':
-                                                                                bonus = 'sinuca'
-                                                                elif rolos['l13'] == '05.jpg':
-                                                                                bonus = 'redbull'
-
-                                #Premio horizontal por linha
-                                if rolos['l1'] == rolos['l4']:
-                                                if rolos['l1'] == rolos['l7']:
-                                                                if rolos['l1'] == rolos['l10']:
-                                                                                if rolos['l1'] == rolos['l13']:
-                                                                                                valor_ganho += 3 * imagens[rolos['l1']] + int(60 * val / 100)
-                                                                                                wins['l65'] = valor_ganho
-                                                                                else:
-                                                                                                valor_ganho += 3 * imagens[rolos['l1']] + int(40 * val / 100)
-                                                                                                wins['l64'] = valor_ganho
-                                                                else:
-                                                                                valor_ganho += 3 * imagens[rolos['l1']] + int(20 * val / 100)
-                                                                                wins['l6'] = valor_ganho
-
-                                if rolos['l7'] == rolos['l10']:
-                                                if rolos['l7'] == rolos['l13']:
-                                                                if rolos['l7'] == rolos['l4']:
-                                                                                if rolos['l7'] == rolos['l1']:
-                                                                                                valor_ganho += 3 * imagens[rolos['l7']] + int(60 * val / 100)
-                                                                                                wins['l75'] = valor_ganho
-                                                                                else:
-                                                                                                valor_ganho += 3 * imagens[rolos['l7']] + int(40 * val / 100)
-                                                                                                wins['l74'] = valor_ganho
-                                                                else:
-                                                                                valor_ganho += 3 * imagens[rolos['l7']] + int(25 * val / 100)
-                                                                                wins['l7'] = valor_ganho
-
-                                if rolos['l2'] == rolos['l5']:
-                                                if rolos['l2'] == rolos['l8']:
-                                                                if rolos['l2'] == rolos['l11']:
-                                                                                if rolos['l2'] == rolos['l14']:
-                                                                                                valor_ganho += 3 * imagens[rolos['l2']] + int(60 * val / 100)
-                                                                                                wins['l225'] = valor_ganho
-                                                                                else:
-                                                                                                valor_ganho += 3 * imagens[rolos['l2']] + int(40 * val / 100)
-                                                                                                wins['l224'] = valor_ganho
-                                                                else:
-                                                                                valor_ganho += 3 * imagens[rolos['l2']] + int(25 * val / 100)
-                                                                                wins['l2'] = valor_ganho
-
-                                if rolos['l8'] == rolos['l11']:
-                                                if rolos['l8'] == rolos['l14']:
-                                                                if rolos['l8'] == rolos['l5']:
-                                                                                if rolos['l8'] == rolos['l2']:
-                                                                                                valor_ganho += 3 * imagens[rolos['l8']] + int(60 * val / 100)
-                                                                                                wins['l85'] = valor_ganho
-                                                                                else:
-                                                                                                valor_ganho += 3 * imagens[rolos['l8']] + int(40 * val / 100)
-                                                                                                wins['l84'] = valor_ganho
-                                                                else:
-                                                                                valor_ganho += 3 * imagens[rolos['l8']] + int(25 * val / 100)
-                                                                                wins['l8'] = valor_ganho
-
-
-                                if rolos['l3'] == rolos['l6']:
-                                                if rolos['l3'] == rolos['l9']:
-                                                                if rolos['l3'] == rolos['l12']:
-                                                                                if rolos['l3'] == rolos['l15']:
-                                                                                                valor_ganho += 3 * imagens[rolos['l3']] + int(60 * val / 100)
-                                                                                                wins['l335'] = valor_ganho
-                                                                                else:
-                                                                                                valor_ganho += 3 * imagens[rolos['l3']] + int(40 * val / 100)
-                                                                                                wins['l334'] = valor_ganho
-                                                                else:
-                                                                                valor_ganho += 3 * imagens[rolos['l3']] + int(25 * val / 100)
-                                                                                wins['l3'] = valor_ganho
-
-
-                                if rolos['l9'] == rolos['l12']:
-                                                if rolos['l9'] == rolos['l15']:
-                                                                if rolos['l9'] == rolos['l6']:
-                                                                                if rolos['l9'] == rolos['l3']:
-                                                                                                valor_ganho += 3 * imagens[rolos['l9']] + int(60 * val / 100)
-                                                                                                wins['l95'] = valor_ganho
-                                                                                else:
-                                                                                                valor_ganho += 3 * imagens[rolos['l9']] + int(40 * val / 100)
-                                                                                                wins['l94'] = valor_ganho
-                                                                else:
-                                                                                valor_ganho += 3 * imagens[rolos['l9']] + int(25 * val / 100)
-                                                                                wins['l9'] = valor_ganho
-
-                                #Premio diagonal esquera pra direita
-                                if rolos['l1'] == rolos['l5']:
-                                                if rolos['l1'] == rolos['l9']:
-                                                                valor_ganho += 3 * imagens[rolos['l1']] + int(25 * val / 100)
-                                                                wins['l12'] = valor_ganho
-
-                                if rolos['l4'] == rolos['l8']:
-                                                if rolos['l4'] == rolos['l12']:
-                                                                valor_ganho += 3 * imagens[rolos['l4']] + int(25 * val / 100)
-                                                                wins['l13'] = valor_ganho
-
-                                if rolos['l7'] == rolos['l11']:
-                                                if rolos['l7'] == rolos['l15']:
-                                                                valor_ganho += 3 * imagens[rolos['l7']] + int(25 * val / 100)
-                                                                wins['l17'] = valor_ganho
-
-                                #Premio diagonal direita para esquerda
-                                if rolos['l13'] == rolos['l11']:
-                                                if rolos['l13'] == rolos['l9']:
-                                                                valor_ganho += 3 * imagens[rolos['l13']] + int(25 * val / 100)
-                                                                wins['l18'] = valor_ganho
-
-                                if rolos['l10'] == rolos['l8']:
-                                                if rolos['l10'] == rolos['l6']:
-                                                                valor_ganho += 3 * imagens[rolos['l10']] + int(25 * val / 100)
-                                                                wins['l19'] = valor_ganho
-
-                                if rolos['l7'] == rolos['l5']:
-                                                if rolos['l7'] == rolos['l3']:
-                                                                valor_ganho += 3 * imagens[rolos['l7']] + int(25 * val / 100)
-                                                                wins['l20'] = valor_ganho
-
-                                return wins, bonus, valor_ganho
-
-                def linha15(self, rolos):
-                                print('linha de 15')
-
-                def linha9(self, rolos):
-                                print('linha de 9')
-
-                def linha5(self, rolos):
-                                print('linha de 5')
-
-                def linha1(self, rolos):
-                                print('linha de 1')
+	banco = Banco().dados()
+	retencao = 0
+	pr_valor = ''
+
+	def main(self):
+		scala = (1360, 720)
+		pygame.init()
+		tela = pygame.display.set_mode(scala)#adicione pygame.FULLSCREEN para deixar full scree
+		pygame.display.set_caption('Anderson Padovani Sistemas')
+		frame = pygame.time.Clock()
+
+		local = os.getcwd() + os.sep + '_imagens' + os.sep
+
+		back_ground = pygame.image.load(local + 'sob-fundo.png')
+		bonus_garrafa = pygame.image.load(local + 'bonus_garrafa.jpg')
+		bonus_roleta = pygame.image.load(local + 'bonus_roleta.jpg')
+
+		# Cria um estilo de fonte padrão para ser exibido na tela
+		style = pygame.font.get_default_font()
+		font = pygame.font.SysFont(style, 65)
+		font_pago = pygame.font.SysFont(style, 30)
+
+		credito = 0
+		premio = 0
+		aposta = 1
+		pago = 0
+		valor_aposta = 1
+		linha = 1
+		divi = ''
+
+		premiacao = {}
+
+		#cores para letras e fundos
+		cor_amarela = (196, 196, 196)
+		cor_vermelho = (240, 0, 0)
+
+		#Variaveis para inserir textos na tela
+		txt_credito = font.render(str(credito), 1, cor_amarela)
+		txt_premio = font.render(str(premio), 1, cor_amarela)
+		txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
+		txt_pago = font_pago.render(str(pago), 1, cor_amarela)
+		txt_valor_aposta = font.render(str(valor_aposta * linha), 1, cor_amarela)
+		txt_sem_credito = font_pago.render('', 1, cor_amarela)
+
+		#imagens da roleta
+		imagens = {'01': '01.jpg', '02': '02.jpg', '03': '03.jpg', '04': '04.jpg', '05': '05.jpg',
+										   '06': '06.jpg', '07': '07.jpg', '08': '08.jpg', '09': '09.jpg', '10': '10.jpg'}
+		retencao = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
+
+		#Variavel que comtem imagens de cada rodda da roleta
+		#selecao = self.roleta(0,0)
+		#imagens pra roleta
+
+		r1 = pygame.image.load(local + '01.jpg')
+		r2 = pygame.image.load(local + '02.jpg')
+		r3 = pygame.image.load(local + '03.jpg')
+
+		r4 = pygame.image.load(local + '04.jpg')
+		r5 = pygame.image.load(local + '05.jpg')
+		r6 = pygame.image.load(local + '06.jpg')
+
+		r7 = pygame.image.load(local + '07.jpg')
+		r8 = pygame.image.load(local + '08.jpg')
+		r9 = pygame.image.load(local + '09.jpg')
+
+		r10 = pygame.image.load(local + '10.jpg')
+		r11 = pygame.image.load(local + '10.jpg')
+		r12 = pygame.image.load(local + '10.jpg')
+
+		r13 = pygame.image.load(local + '02.jpg')
+		r14 = pygame.image.load(local + '02.jpg')
+		r15 = pygame.image.load(local + '02.jpg')
+
+		tela_jogo= True
+		tela_config = False
+		tela_roda = False
+		tela_premio = False
+		b_bruxa = False
+		b_sinuca = False
+		b_redbull = False
+		tela_pagamento = False
+		tela_premiacao = False
+		md = False
+
+		gira = 0
+		tm = 0
+		lop = 0
+		while True:
+
+			if tela_jogo:
+				for event in pygame.event.get():
+					# Captura evento QUIT que fexa o programa no X
+					if event.type == pygame.QUIT:
+						pygame.quit()  # Fexa o programa ao paertar no X
+						sys.exit()  # Finaliza processos ao fexar o programa
+
+					# Captura evento do mouse
+					if event.type == pygame.MOUSEBUTTONDOWN:
+						print(pygame.mouse.get_pos())
+						tela_jogo = False
+						tela_config = True
+
+
+					# Capttura eventos do teclado
+					if event.type == pygame.KEYDOWN:
+						if event.key == K_q:  # Informa qual é o evento
+							pygame.quit()
+							sys.exit()
+
+						# Eventos de inserir nota
+						if event.key == 49:
+							credito += 200
+							txt_credito = font.render(str(credito), 1, cor_amarela)
+							self.salva(aposta, premio, pago, credito, valor_aposta)
+							self.deposito(200)							
+						if event.key == 50:
+							credito += 500
+							txt_credito = font.render(str(credito), 1, cor_amarela)
+							self.salva(aposta, premio, pago, credito, valor_aposta)
+							self.deposito(500)							
+						if event.key == 51:
+							credito += 1000
+							txt_credito = font.render(str(credito), 1, cor_amarela)
+							self.salva(aposta, premio, pago, credito, valor_aposta)
+							self.deposito(1000)							
+						if event.key == 52:
+							credito += 2000
+							txt_credito = font.render(str(credito), 1, cor_amarela)
+							self.salva(aposta, premio, pago, credito, valor_aposta)
+							self.deposito(2000)							
+						if event.key == 53:
+							credito += 5000
+							txt_credito = font.render(str(credito), 1, cor_amarela)
+							self.salva(aposta, premio, pago, credito, valor_aposta)
+							self.deposito(5000)
+							
+
+						# So meche na maquina com credito
+						if credito != 0:
+							#Eventos de mudar valor da aposta
+							if event.key == 119 or 101 or 114 or 116 or 121:
+								if event.key == 119:
+									valor_aposta = self.linha(1)
+									linha = self.linha(1)
+									valor_aposta = linha * aposta
+									txt_valor_aposta = font.render(str(linha * aposta), 1, cor_amarela)
+									#txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
+
+								if event.key == 101:
+									linha = self.linha(5)
+									valor_aposta = linha * aposta
+									txt_valor_aposta = font.render(str(linha * aposta), 1, cor_amarela)
+									#txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
+
+								if event.key == 114:
+									linha = self.linha(9)
+									valor_aposta = linha * aposta
+									txt_valor_aposta = font.render(str(linha * aposta), 1, cor_amarela)
+									#txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
+
+								if event.key == 116:
+									linha = self.linha(15)
+									valor_aposta = linha * aposta
+									txt_valor_aposta = font.render(str(linha * aposta), 1, cor_amarela)
+									#txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
+
+
+								if event.key == 121:
+									linha = self.linha(25)
+									valor_aposta = linha * aposta
+									txt_valor_aposta = font.render(str(linha * aposta), 1, cor_amarela)
+									#txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
+
+
+							if aposta <= 40:
+								# Evento de inserir aposta
+
+								# Aumenta Aposta
+								if event.key == pygame.K_a:
+									if aposta <= 39:
+										aposta += 1
+										valor_aposta = linha * aposta
+										txt_valor_aposta = font.render(str(valor_aposta), 1, cor_amarela)
+										txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
+
+								#Diminui aposta
+								if event.key == pygame.K_s:
+									if aposta != 1:
+										aposta -= 1
+										valor_aposta = linha * aposta
+										txt_valor_aposta = font.render(str(valor_aposta), 1, cor_amarela)
+										txt_aposta = font_pago.render(str(aposta), 1, cor_amarela)
+
+								#Gira roleta
+								if event.key == pygame.K_g:
+									if valor_aposta <= credito:
+										txt_sem_credito = font_pago.render('', 1, cor_vermelho)
+
+										credito -= valor_aposta
+										premio = 0
+										pago = 0
+
+										txt_credito = font.render(str(credito), 1, cor_amarela)
+										txt_premio = font.render(str(0), 1, cor_amarela)
+										txt_pago = font_pago.render(str(0), 1, cor_amarela)
+										divi = self.roleta(aposta, linha, valor_aposta)
+										selecao = divi[0]
+										if divi[1] != None:
+											premiacao = divi[1][0]
+										self.salva(aposta, premio, pago, credito, valor_aposta)
+										tela_jogo = False
+										tela_roda = True
+									else:
+										txt_sem_credito = font_pago.render('Não há créditos suficiente', 1, cor_vermelho)
+
+					# Regula a frequencia de atualização da tela "Frame"
+					frame.tick(60)
+
+					# Imprime BackGrounds
+					tela.blit(pygame.transform.scale(back_ground, scala), (0, 0))  # Deixa Scalavel
+
+					# imprime Textos
+					tela.blit(txt_credito, (335, 55))  # Imprime na tela OBS sempre apos os bcg pois imprime sequencial
+					tela.blit(txt_aposta, (1024, 115))
+					tela.blit(txt_premio, (704, 55))
+					tela.blit(txt_pago, (215, 122))
+					tela.blit(txt_valor_aposta, (1073, 55))
+					tela.blit(txt_sem_credito, (531, 114))
+					#imprime imagens roleta
+					tela.blit(r1, (123, 146))
+					tela.blit(r2, (123, 292))
+					tela.blit(r3, (123, 439))
+
+					tela.blit(r4, (345, 146))
+					tela.blit(r5, (345, 292))
+					tela.blit(r6, (345, 439))
+
+					tela.blit(r7, (569, 146))
+					tela.blit(r8, (569, 292))
+					tela.blit(r9, (569, 439))
+
+					tela.blit(r10, (793, 146))
+					tela.blit(r11, (793, 292))
+					tela.blit(r12, (793, 439))
+
+					tela.blit(r13, (1016, 146))
+					tela.blit(r14, (1016, 292))
+					tela.blit(r15, (1016, 439))
+
+					# Ativa SCLE de tela
+					pygame.display.flip()
+
+					# Serve para atualizar a tela a cada loop
+					pygame.display.update()
+
+
+			#Tela que imprime a rodada
+			elif tela_roda:
+
+				if gira < 15:
+					r1 = pygame.image.load(local + imagens[random.choice(retencao)])
+					r2 = pygame.image.load(local + imagens[random.choice(retencao)])
+					r3 = pygame.image.load(local + imagens[random.choice(retencao)])
+
+				if gira < 20:
+					r4 = pygame.image.load(local + imagens[random.choice(retencao)])
+					r5 = pygame.image.load(local + imagens[random.choice(retencao)])
+					r6 = pygame.image.load(local + imagens[random.choice(retencao)])
+
+				if gira < 25:
+					r7 = pygame.image.load(local + imagens[random.choice(retencao)])
+					r8 = pygame.image.load(local + imagens[random.choice(retencao)])
+					r9 = pygame.image.load(local + imagens[random.choice(retencao)])
+
+				if gira < 30:
+					r10 = pygame.image.load(local + imagens[random.choice(retencao)])
+					r11 = pygame.image.load(local + imagens[random.choice(retencao)])
+					r12 = pygame.image.load(local + imagens[random.choice(retencao)])
+
+				if gira < 35:
+					r13 = pygame.image.load(local + imagens[random.choice(retencao)])
+					r14 = pygame.image.load(local + imagens[random.choice(retencao)])
+					r15 = pygame.image.load(local + imagens[random.choice(retencao)])
+
+
+
+				if gira == 15:
+					r1 = pygame.image.load(local + selecao[0])
+					r2 = pygame.image.load(local + selecao[1])
+					r3 = pygame.image.load(local + selecao[2])
+
+				if gira == 20:
+					r4 = pygame.image.load(local + selecao[3])
+					r5 = pygame.image.load(local + selecao[4])
+					r6 = pygame.image.load(local + selecao[5])
+
+				if gira == 25:
+					r7 = pygame.image.load(local + selecao[6])
+					r8 = pygame.image.load(local + selecao[7])
+					r9 = pygame.image.load(local + selecao[8])
+
+				if gira == 30:
+					r10 = pygame.image.load(local + selecao[9])
+					r11 = pygame.image.load(local + selecao[10])
+					r12 = pygame.image.load(local + selecao[11])
+
+				if gira == 35:
+					gira = 0
+					r13 = pygame.image.load(local + selecao[12])
+					r14 = pygame.image.load(local + selecao[13])
+					r15 = pygame.image.load(local + selecao[14])
+
+					if premiacao == {}:
+						tela_jogo = True
+						tela_roda = False
+
+					if premiacao != {}:
+						tela_premiacao = True
+						for pr in premiacao.keys():
+							premio += premiacao[pr]
+
+						if divi[1][1] != '':
+							premiacao = {}
+							print(premio)
+							txt_premio = font.render(str(premio), 1, cor_amarela)
+
+							if divi[1][1] == 'bruxa':
+								md = True
+								b_bruxa = True
+								tela_roda = False
+
+							if divi[1][1] == 'sinuca':
+								md = True
+								b_sinuca = True
+								tela_roda = False
+
+							if divi[1][1] == 'redbull':
+								md = True
+								print('foi premiado')
+								b_redbull = True
+								tela_roda = False
+
+						else:
+							pago = premio
+							credito += premio
+							premiacao = {}
+
+							txt_credito = font.render(str(credito), 1, cor_amarela)
+							txt_premio = font.render(str(premio), 1, cor_amarela)
+							txt_pago = font_pago.render(str(pago), 1, cor_amarela)
+
+							tela_premiacao = True
+							tela_roda = False
+
+				gira += 1
+
+				frame.tick(60)
+				#Imprime na tela
+				tela.blit(r1, (123, 146))
+				tela.blit(r2, (123, 292))
+				tela.blit(r3, (123, 439))
+
+				tela.blit(r4, (345, 146))
+				tela.blit(r5, (345, 292))
+				tela.blit(r6, (345, 439))
+
+				tela.blit(r7, (569, 146))
+				tela.blit(r8, (569, 292))
+				tela.blit(r9, (569, 439))
+
+				tela.blit(r10, (793, 146))
+				tela.blit(r11, (793, 292))
+				tela.blit(r12, (793, 439))
+
+				tela.blit(r13, (1016, 146))
+				tela.blit(r14, (1016, 292))
+				tela.blit(r15, (1016, 439))
+
+				pygame.display.flip()
+				pygame.display.update()
+				if md:
+					pygame.time.wait(2000)
+					md = False
+
+			elif tela_premiacao:
+				if tm < 10:
+					im_convert = {'01.jpg': '01p.jpg', '02.jpg': '02p.jpg', '03.jpg': '03p.jpg', '04.jpg': '04p.jpg', '05.jpg': '05p.jpg',
+					'06.jpg': '06p.jpg', '07.jpg': '07p.jpg', '08.jpg': '08p.jpg', '09.jpg': '09p.jpg', '10.jpg': '10p.jpg' }
+
+					vlrs = self.pr_valor
+					for pr in vlrs.keys():
+						if pr == 'l1':
+							r1 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r2 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r3 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l4':
+							r4 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r5 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r6 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l7':
+							r7 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r9 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l10':
+							r10 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r11 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r12 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l15':
+							r13 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r14 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r15 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l65':
+							r1 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r4 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r7 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r10 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r13 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == 'l64':
+							r1 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r4 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r7 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r10 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == 'l63':
+							r1 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r4 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r7 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l75':
+							r7 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r10 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r13 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r4 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r1 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == 'l74':
+							r7 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r10 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r13 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r4 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == 'l73':
+							r7 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r10 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r13 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l225':
+							r2 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r5 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r11 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r14 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == 'l224':
+							r2 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r5 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r11 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == 'l23':
+							r2 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r5 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l85':
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r11 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r14 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r5 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r2 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == 'l84':
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r11 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r14 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r5 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == 'l83':
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r11 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r14 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l335':
+							r3 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r6 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r9 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r12 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r15 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == 'l334':
+							r3 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r6 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r9 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r12 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == 'l33':
+							r3 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r6 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r9 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l95':
+							r9 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r12 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r15 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r6 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r3 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == 'l94':
+							r9 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r12 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r15 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r6 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == 'l93':
+							r9 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r12 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r15 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l12':
+							r1 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r5 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r9 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l13':
+							r4 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r12 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l17':
+							r7 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r11 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r15 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l18':
+							r13 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r11 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r9 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l19':
+							r10 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r6 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == 'l20':
+							r7 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r5 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r3 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == '015':
+							r1 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r4 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r12 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r15 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == '014':
+							r1 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r4 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r12 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == '013':
+							r1 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r4 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == '025':
+							r15 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r12 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r4 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r1 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == '024':
+							r15 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r12 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r4 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == '023':
+							r15 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r12 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == '035':
+							r3 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r6 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r10 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r13 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == '034':
+							r3 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r6 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r10 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == '033':
+							r3 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r6 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == '045':
+							r13 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r10 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r6 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r3 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == '044':
+							r13 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r10 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r6 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == '043':
+							r13 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r10 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == '055':
+							r1 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r5 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r9 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r11 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r13 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == '054':
+							r1 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r5 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r9 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r11 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == '065':
+							r3 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r5 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r7 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r11 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r15 = pygame.image.load(local + im_convert[vlrs[pr]])
+						if pr == '064':
+							r3 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r5 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r7 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r11 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == '073':
+							r6 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r2 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == '083':
+							r9 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r11 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r5 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == '093':
+							r12 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r14 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == '0103':
+							r4 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r2 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == '0113':
+							r7 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r5 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r11 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+						if pr == '0123':
+							r10 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r8 = pygame.image.load(local + im_convert[vlrs[pr]])
+							r4 = pygame.image.load(local + im_convert[vlrs[pr]])
+
+
+
+				tela_premiacao = False
+
+				if divi[1][1] == '':
+					tela_jogo = True
+
+				frame.tick(30)
+				tela.blit(r1, (123, 146))
+				tela.blit(r2, (123, 292))
+				tela.blit(r3, (123, 439))
+
+				tela.blit(r4, (345, 146))
+				tela.blit(r5, (345, 292))
+				tela.blit(r6, (345, 439))
+
+				tela.blit(r7, (569, 146))
+				tela.blit(r8, (569, 292))
+				tela.blit(r9, (569, 439))
+
+				tela.blit(r10, (793, 146))
+				tela.blit(r11, (793, 292))
+				tela.blit(r12, (793, 439))
+
+				tela.blit(r13, (1016, 146))
+				tela.blit(r14, (1016, 292))
+				tela.blit(r15, (1016, 439))
+
+				pygame.display.flip()
+				pygame.display.update()
+
+				tm +=1
+
+			elif b_sinuca:
+				print('sinuca')
+				tela_jogo = True
+				b_sinuca = False
+
+
+			elif b_redbull:
+
+				for event in pygame.event.get():
+					# Captura evento QUIT que fexa o programa no X
+					if event.type == pygame.QUIT:
+						pygame.quit()  # Fexa o programa ao paertar no X
+						sys.exit()  # Finaliza processos ao fexar o programa
+
+					# Captura evento do mouse
+					if event.type == pygame.MOUSEBUTTONDOWN:
+						print(pygame.mouse.get_pos())                        
+						
+					if tm < 1:
+						tm += 1
+						pygame.time.wait(1000)
+
+					if event.type == pygame.KEYDOWN:
+
+						if event.key == pygame.K_w:
+							print(self.bonus(10))
+							print('escolheu 1')
+							tm = 0
+							tela_jogo = True
+							b_redbull = False
+
+				frame.tick(30)
+				tela.blit(pygame.transform.scale(bonus_garrafa, scala), (0, 0))
+				pygame.display.update()
+
+			elif b_bruxa:
+				g = False
+				lop += 60
+				crd = font.render(str(credito), 1, cor_amarela)
+				roleta_garrafa = pygame.image.load(local + 'garrafa.png')
+				
+				lock = (382, 318)
+				new_roleta_garrafa = pygame.transform.rotate(roleta_garrafa, lop)
+				rot = new_roleta_garrafa.get_rect(center = lock)
+
+
+				for event in pygame.event.get():
+					# Captura evento QUIT que fexa o programa no X
+					if event.type == pygame.QUIT:
+						pygame.quit()  # Fexa o programa ao paertar no X
+						sys.exit()  # Finaliza processos ao fexar o programa
+
+					# Captura evento do mouse
+					if event.type == pygame.MOUSEBUTTONDOWN:
+						print(pygame.mouse.get_pos())                        
+						
+					if tm < 1:
+						tm += 1
+						pygame.time.wait(1000)
+
+					if event.type == pygame.KEYDOWN:
+						if event.key == pygame.K_q:
+							pygame.quit()
+							sys.exit()
+
+						if event.key == pygame.K_g:
+							if valor_aposta <= 100:
+								escolha = random.randint(1, 27)
+							elif valor_aposta <= 500:
+								escolha = random.randint(1, 10)
+							elif valor_aposta >= 500:
+								escolha = random.randint(1, 5)
+
+							premio = valor_aposta * escolha
+							credito += premio
+							pago += premio
+
+							new_roleta_garrafa = pygame.transform.rotate(roleta_garrafa, (6.66 * escolha))
+
+							tela.blit(new_roleta_garrafa, rot)
+
+							print(escolha)
+							tm = 0
+							g = True
+
+							txt_credito = font.render(str(credito), 1, cor_amarela)
+							txt_premio = font.render(str(premio), 1, cor_amarela)
+							txt_pago = font_pago.render(str(pago), 1, cor_amarela)
+
+
+				frame.tick(30)
+				tela.blit(pygame.transform.scale(bonus_roleta, scala), (0, 0))
+				tela.blit(new_roleta_garrafa, rot)
+
+				tela.blit(crd, (332, 560))
+				tela.blit(txt_premio, (709, 560))
+				pygame.display.update()
+				if g:
+					pygame.time.wait(5000)
+					b_bruxa = False
+					tela_jogo = True
+
+			elif tela_pagamento:
+				pass
+
+
+
+			elif tela_config:
+
+				for event in pygame.event.get():
+					cor_amarela = (196, 196, 196)
+					txt_cfg = font.render(str('tela de config'), 1, cor_amarela)
+					if event.type == pygame.KEYDOWN:
+						if event.key == pygame.K_j:
+							tela_jogo = True
+							tela_config = False
+
+					frame.tick(30)
+					tela.blit(pygame.transform.scale(bonus_garrafa, scala), (0, 0))  # Deixa Scalavel
+
+					tela.blit(txt_cfg, (0,0))
+
+					# Ativa SCLE de tela
+					pygame.display.flip()
+
+					# Serve para atualizar a tela a cada loop
+					pygame.display.update()
+
+
+	#define em qual linha o ojador quer
+	def linha(self, tipo):
+		if tipo == 1:
+			return 1
+		if tipo == 5:
+			return 5
+		if tipo == 9:
+			return 9
+		if tipo == 15:
+			return 15
+		if tipo == 25:
+			return 25
+
+	def bonus(self, val):
+		RETEN = [500, 150, 100, 75, 50, 25]
+		for i in range(self.retencao):
+			RETEN.append(100)
+			RETEN.append(75)
+			RETEN.append(50)
+			RETEN.append(25)
+
+		return random.choice(RETEN)
+
+
+
+	def roleta(self, aposta, linhas, apValor):
+		data = self.banco
+		var = "SELECT reten FROM user WHERE usuario = 'admin'"
+		ex = data.cursor()
+		ex.execute(var)
+
+		#Pega Valor do Banco par informar o valor a reter
+		RET = ex.fetchall()[0][0]
+		self.retencao = RET
+
+		#referencia da imagens da roleta
+		imagens = {'01': '01.jpg', '02': '02.jpg', '03': '03.jpg', '04': '04.jpg', '05': '05.jpg', '06': '06.jpg', '07': '07.jpg',
+										   '08': '08.jpg', '09': '09.jpg', '10': '10.jpg' }
+
+		#Lista com valores para sorteio quanto mais numero maior a retenção
+		retencao = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
+
+		if RET > 1:
+			for add in range(int(RET)):
+
+				retencao.append('05')
+				retencao.append('03')
+				retencao.append('05')
+				retencao.append('04')
+				retencao.append('05')
+
+				retencao.append('08')
+				retencao.append('06')				
+				retencao.append('08')
+				retencao.append('07')
+				retencao.append('08')
+
+				retencao.append('09')
+				retencao.append('10')
+				retencao.append('09')
+				retencao.append('09')
+
+		img = []
+
+		listagen = {}
+		for i in range(1, 16):
+
+			rand = imagens[random.choice(retencao)]
+			img.append(rand)
+			r = 'l'+str(i)
+			listagen[r] = rand
+
+		verifica_premios = ''
+
+		if linhas == 25:
+			verifica_premios = self.linha25(listagen, apValor)
+			self.pr_valor = verifica_premios[3]
+
+		if linhas == 15:
+			verifica_premios = self.linha15(listagen, apValor)
+			self.pr_valor = verifica_premios[3]
+
+		if linhas == 9:
+			verifica_premios = self.linha9(listagen, apValor)
+			self.pr_valor = verifica_premios[3]
+
+		if linhas == 5:
+			verifica_premios = self.linha5(listagen, apValor)
+			self.pr_valor = verifica_premios[3]
+
+		if linhas == 1:
+			verifica_premios = self.linha1(listagen, apValor)
+			self.pr_valor = verifica_premios[3]
+
+		return img, verifica_premios
+
+	def salva(self, ap, pr, pa, cr, va):
+		data = self.banco
+		relogio = str(datetime.datetime.now()).split('.')[0]
+		hora = relogio
+		# Salva ultimo estado do credito da maquina
+		#if tipo == 'credito':
+		var = "INSERT INTO ultima_aposta (id, B_aposta, B_premio, B_pago, B_credito, B_valor_aposta, data) VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s');" % (ap, pr, pa, cr, va, hora)
+		grava = data.cursor()
+		grava.execute(var)
+		data.commit()
+
+
+	def linha25(self, rolos, val):
+		imagens = {'01.jpg': 500,'02.jpg': 300, '03.jpg': 25, '04.jpg': 20, '05.jpg': 9, '06.jpg': 7, '07.jpg': 5,
+										   '08.jpg': 4, '09.jpg': 2, '10.jpg': 1 }
+
+		valor_ganho = (15 * val / 100)
+		bonus = ''
+		wins = {}
+		img_wins = {}
+		#Premio vertical por coluna
+		if rolos['l1'] == rolos['l2']:
+			if rolos['l1'] == rolos['l3']:
+				img_wins['l1'] = rolos['l1']
+				valor_ganho += 3 * imagens[rolos['l1']]
+				wins['l1'] = valor_ganho
+				if rolos['l1'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l1'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l1'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l4'] == rolos['l5']:
+			if rolos['l4'] == rolos['l6']:
+				img_wins['l4'] = rolos['l6']
+				valor_ganho += 3 * imagens[rolos['l4']]
+				wins['l4'] = valor_ganho
+				if rolos['l4'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l4'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l4'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l7'] == rolos['l8']:
+			if rolos['l7'] == rolos['l9']:
+				img_wins['l7'] = rolos['l7']
+				valor_ganho += 3 * imagens[rolos['l7']]
+				wins['l7'] = valor_ganho
+				if rolos['l7'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l7'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l7'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l10'] == rolos['l11']:
+			if rolos['l10'] == rolos['l12']:
+				img_wins['l10'] = rolos['l10']
+				valor_ganho += 3 * imagens[rolos['l10']]
+				wins['l10'] = valor_ganho
+				if rolos['l10'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l10'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l10'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l13'] == rolos['l14']:
+			if rolos['l13'] == rolos['l15']:
+				img_wins['l15'] = rolos['l13']
+				valor_ganho += 3 * imagens[rolos['l13']]
+				wins['l15'] = valor_ganho
+				if rolos['l13'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l13'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l13'] == '05.jpg':
+					bonus = 'redbull'
+
+		#Premio horizontal por linha
+		if rolos['l1'] == rolos['l4']:
+			if rolos['l1'] == rolos['l7']:
+				if rolos['l1'] == rolos['l10']:
+					if rolos['l1'] == rolos['l13']:
+						img_wins['l65'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['l65'] = valor_ganho
+					else:
+						img_wins['l64'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['l64'] = valor_ganho
+				else:
+					img_wins['l63'] = rolos['l1']
+					valor_ganho += 3 * imagens[rolos['l1']]
+					wins['l63'] = valor_ganho
+
+		if rolos['l7'] == rolos['l10']:
+			if rolos['l7'] == rolos['l13']:
+				if rolos['l7'] == rolos['l4']:
+					if rolos['l7'] == rolos['l1']:
+						img_wins['l75'] = rolos['l7']
+						valor_ganho += 3 * imagens[rolos['l7']]
+						wins['l75'] = valor_ganho
+					else:
+						img_wins['l74'] = rolos['l7']
+						valor_ganho += 3 * imagens[rolos['l7']]
+						wins['l74'] = valor_ganho
+				else:
+					img_wins['l73'] = rolos['l7']
+					valor_ganho += 3 * imagens[rolos['l7']]
+					wins['l73'] = valor_ganho
+
+		if rolos['l2'] == rolos['l5']:
+			if rolos['l2'] == rolos['l8']:
+				if rolos['l2'] == rolos['l11']:
+					if rolos['l2'] == rolos['l14']:
+						img_wins['l225'] = rolos['l2']
+						valor_ganho += 3 * imagens[rolos['l2']]
+						wins['l225'] = valor_ganho
+					else:
+						img_wins['l224'] = rolos['l2']
+						valor_ganho += 3 * imagens[rolos['l2']]
+						wins['l224'] = valor_ganho
+				else:
+					img_wins['l23'] = rolos['l2']
+					valor_ganho += 3 * imagens[rolos['l2']]
+					wins['l23'] = valor_ganho
+
+		if rolos['l8'] == rolos['l11']:
+			if rolos['l8'] == rolos['l14']:
+				if rolos['l8'] == rolos['l5']:
+					if rolos['l8'] == rolos['l2']:
+						img_wins['l85'] = rolos['l8']
+						valor_ganho += 3 * imagens[rolos['l8']]
+						wins['l85'] = valor_ganho
+					else:
+						img_wins['l84'] = rolos['l8']
+						valor_ganho += 3 * imagens[rolos['l8']]
+						wins['l84'] = valor_ganho
+				else:
+					img_wins['l83'] = rolos['l8']
+					valor_ganho += 3 * imagens[rolos['l8']]
+					wins['l83'] = valor_ganho
+
+
+		if rolos['l3'] == rolos['l6']:
+			if rolos['l3'] == rolos['l9']:
+				if rolos['l3'] == rolos['l12']:
+					if rolos['l3'] == rolos['l15']:
+						img_wins['l335'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['l335'] = valor_ganho
+					else:
+						img_wins['l334'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['l334'] = valor_ganho
+				else:
+					img_wins['l33'] = rolos['l3']
+					valor_ganho += 3 * imagens[rolos['l3']]
+					wins['l33'] = valor_ganho
+
+
+		if rolos['l9'] == rolos['l12']:
+			if rolos['l9'] == rolos['l15']:
+				if rolos['l9'] == rolos['l6']:
+					if rolos['l9'] == rolos['l3']:
+						img_wins['l95'] = rolos['l9']
+						valor_ganho += 3 * imagens[rolos['l9']]
+						wins['l95'] = valor_ganho
+					else:
+						img_wins['l94'] = rolos['l9']
+						valor_ganho += 3 * imagens[rolos['l9']]
+						wins['l94'] = valor_ganho
+				else:
+					img_wins['l93'] = rolos['l9']
+					valor_ganho += 3 * imagens[rolos['l9']]
+					wins['l93'] = valor_ganho
+
+		#Premio diagonal esquera pra direita
+		if rolos['l1'] == rolos['l5']:
+			if rolos['l1'] == rolos['l9']:
+				print('Premio em Diag Esq l1')
+				img_wins['l12'] = rolos['l1']
+				valor_ganho += 3 * imagens[rolos['l1']]
+				wins['l12'] = valor_ganho
+
+		if rolos['l4'] == rolos['l8']:
+			if rolos['l4'] == rolos['l12']:
+				print('Premio em Diag Direi l4')
+				img_wins['l13'] = rolos['l4']
+				valor_ganho += 3 * imagens[rolos['l4']]
+				wins['l13'] = valor_ganho
+
+		if rolos['l7'] == rolos['l11']:
+			if rolos['l7'] == rolos['l15']:
+				print('Premio em Diag Direi l7')
+				img_wins['l17'] = rolos['l7']
+				valor_ganho += 3 * imagens[rolos['l7']]
+				wins['l17'] = valor_ganho
+
+		#Premio diagonal direita para esquerda
+		if rolos['l13'] == rolos['l11']:
+			if rolos['l13'] == rolos['l9']:
+				print('Premio em Diag Direi l13')
+				img_wins['l18'] = rolos['l13']
+				valor_ganho += 3 * imagens[rolos['l13']]
+				wins['l18'] = valor_ganho
+
+		if rolos['l10'] == rolos['l8']:
+			if rolos['l10'] == rolos['l6']:
+				print('Premio em Diag Direi l10')
+				img_wins['l19'] = rolos['l10']
+				valor_ganho += 3 * imagens[rolos['l10']]
+				wins['l19'] = valor_ganho
+
+		if rolos['l7'] == rolos['l5']:
+			if rolos['l7'] == rolos['l3']:
+				print('Premio em Diag Direi l7')
+				img_wins['l20'] = rolos['l7']
+				valor_ganho += 3 * imagens[rolos['l7']]
+				wins['l20'] = valor_ganho
+
+		#Premiaçao em X
+		if rolos['l1'] == rolos['l4']:
+			if rolos['l1'] == rolos['l8']:
+				print('Premio em X l1')
+				if rolos['l1'] == rolos['l12']:
+					if rolos['l1'] == rolos['l15']:
+						img_wins['015'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['015'] = valor_ganho
+
+					else:
+						img_wins['014'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['014'] = valor_ganho
+				else:
+					img_wins['013'] = rolos['l1']
+					valor_ganho += 3 * imagens[rolos['l1']]
+					wins['013'] = valor_ganho
+
+		if rolos['l15'] == rolos['l12']:
+			if rolos['l15'] == rolos['l8']:
+				print('Premio em X l5')
+				if rolos['l15'] == rolos['l4']:
+					if rolos['l15'] == rolos['l1']:
+						img_wins['025'] = rolos['l15']
+						valor_ganho += 3 * imagens[rolos['l15']]
+						wins['025'] = valor_ganho
+
+					else:
+						img_wins['024'] = rolos['l15']
+						valor_ganho += 3 * imagens[rolos['l15']]
+						wins['024'] = valor_ganho
+				else:
+					img_wins['023'] = rolos['l15']
+					valor_ganho += 3 * imagens[rolos['l15']]
+					wins['023'] = valor_ganho
+
+		if rolos['l3'] == rolos['l6']:
+			if rolos['l3'] == rolos['l8']:
+				print('Premio em X l3')
+				if rolos['l3'] == rolos['l10']:
+					if rolos['l3'] == rolos['l13']:
+						img_wins['035'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['035'] = valor_ganho
+
+					else:
+						img_wins['034'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['034'] = valor_ganho
+				else:
+					img_wins['033'] = rolos['l3']
+					valor_ganho += 3 * imagens[rolos['l3']]
+					wins['033'] = valor_ganho
+
+		if rolos['l13'] == rolos['l10']:
+			if rolos['l13'] == rolos['l8']:
+				print('Premio em X l13')
+				if rolos['l13'] == rolos['l6']:
+					if rolos['l13'] == rolos['l13']:
+						img_wins['045'] = rolos['l13']
+						valor_ganho += 3 * imagens[rolos['l13']]
+						wins['045'] = valor_ganho
+
+					else:
+						img_wins['044'] = rolos['l13']
+						valor_ganho += 3 * imagens[rolos['l13']]
+						wins['044'] = valor_ganho
+				else:
+					img_wins['043'] = rolos['l13']
+					valor_ganho += 3 * imagens[rolos['l13']]
+					wins['043'] = valor_ganho
+
+		#Premiaçao em piramide
+		if rolos['l1'] == rolos['l5']:
+			if rolos['l1'] == rolos['l9']:
+				print('Premio em Piramide l1')
+				if rolos['l1'] == rolos['l11']:
+					if rolos['l1'] == rolos['l13']:
+						img_wins['055'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['055'] = valor_ganho
+
+					else:
+						img_wins['054'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['054'] = valor_ganho
+
+		if rolos['l3'] == rolos['l5']:
+			if rolos['l3'] == rolos['l7']:
+				print('Premio em Piramide l3')
+				if rolos['l3'] == rolos['l11']:
+					if rolos['l3'] == rolos['l15']:
+						img_wins['065'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['065'] = valor_ganho
+
+					else:
+						img_wins['064'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['064'] = valor_ganho
+
+		#premiação em V
+		if rolos['l6'] == rolos['l8']:
+			if rolos['l6'] == rolos['l2']:
+				print('Premio em V l6')
+				img_wins['073'] = rolos['l6']
+				valor_ganho += 3 * imagens[rolos['l6']]
+				wins['073'] = valor_ganho
+
+		if rolos['l9'] == rolos['l11']:
+			if rolos['l9'] == rolos['l5']:
+				print('Premio em V l9')
+				img_wins['083'] = rolos['l9']
+				valor_ganho += 3 * imagens[rolos['l9']]
+				wins['083'] = valor_ganho
+
+		if rolos['l12'] == rolos['l14']:
+			if rolos['l12'] == rolos['l8']:
+				print('Premio em V l12')
+				img_wins['093'] = rolos['l12']
+				valor_ganho += 3 * imagens[rolos['l12']]
+				wins['093'] = valor_ganho
+
+		if rolos['l4'] == rolos['l2']:
+			if rolos['l4'] == rolos['l8']:
+				print('Premio em V l4')
+				img_wins['0103'] = rolos['l4']
+				valor_ganho += 3 * imagens[rolos['l4']]
+				wins['0103'] = valor_ganho
+
+		if rolos['l7'] == rolos['l5']:
+			if rolos['l7'] == rolos['l11']:
+				print('Premio em V l7')
+				img_wins['0113'] = rolos['l7']
+				valor_ganho += 3 * imagens[rolos['l7']]
+				wins['0113'] = valor_ganho
+
+		if rolos['l10'] == rolos['l8']:
+			if rolos['l10'] == rolos['l14']:
+				print('Premio em V l10')
+				img_wins['0123'] = rolos['l10']
+				valor_ganho += 3 * imagens[rolos['l10']]
+				wins['0123'] = valor_ganho
+
+
+
+
+		return wins, bonus, valor_ganho, img_wins
+
+	def linha15(self, rolos, val):
+		imagens = {'01.jpg': 500,'02.jpg': 300, '03.jpg': 25, '04.jpg': 20, '05.jpg': 9, '06.jpg': 7, '07.jpg': 5,
+										   '08.jpg': 4, '09.jpg': 2, '10.jpg': 1 }
+
+		valor_ganho = (10 * val / 100)
+		bonus = ''
+		wins = {}
+		img_wins = {}
+		#Premio vertical por coluna
+		if rolos['l1'] == rolos['l2']:
+			if rolos['l1'] == rolos['l3']:
+				img_wins['l1'] = rolos['l1']
+				valor_ganho += 3 * imagens[rolos['l1']]
+				wins['l1'] = valor_ganho
+				if rolos['l1'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l1'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l1'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l4'] == rolos['l5']:
+			if rolos['l4'] == rolos['l6']:
+				img_wins['l4'] = rolos['l6']
+				valor_ganho += 3 * imagens[rolos['l4']]
+				wins['l4'] = valor_ganho
+				if rolos['l4'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l4'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l4'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l7'] == rolos['l8']:
+			if rolos['l7'] == rolos['l9']:
+				img_wins['l7'] = rolos['l7']
+				valor_ganho += 3 * imagens[rolos['l7']]
+				wins['l7'] = valor_ganho
+				if rolos['l7'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l7'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l7'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l10'] == rolos['l11']:
+			if rolos['l10'] == rolos['l12']:
+				img_wins['l10'] = rolos['l10']
+				valor_ganho += 3 * imagens[rolos['l10']]
+				wins['l10'] = valor_ganho
+				if rolos['l10'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l10'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l10'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l13'] == rolos['l14']:
+			if rolos['l13'] == rolos['l15']:
+				img_wins['l15'] = rolos['l13']
+				valor_ganho += 3 * imagens[rolos['l13']]
+				wins['l15'] = valor_ganho
+				if rolos['l13'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l13'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l13'] == '05.jpg':
+					bonus = 'redbull'
+
+		#Premio horizontal por linha
+		if rolos['l1'] == rolos['l4']:
+			if rolos['l1'] == rolos['l7']:
+				if rolos['l1'] == rolos['l10']:
+					if rolos['l1'] == rolos['l13']:
+						img_wins['l65'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['l65'] = valor_ganho
+					else:
+						img_wins['l64'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['l64'] = valor_ganho
+				else:
+					img_wins['l63'] = rolos['l1']
+					valor_ganho += 3 * imagens[rolos['l1']]
+					wins['l63'] = valor_ganho
+
+		if rolos['l7'] == rolos['l10']:
+			if rolos['l7'] == rolos['l13']:
+				if rolos['l7'] == rolos['l4']:
+					if rolos['l7'] == rolos['l1']:
+						img_wins['l75'] = rolos['l7']
+						valor_ganho += 3 * imagens[rolos['l7']]
+						wins['l75'] = valor_ganho
+					else:
+						img_wins['l74'] = rolos['l7']
+						valor_ganho += 3 * imagens[rolos['l7']]
+						wins['l74'] = valor_ganho
+				else:
+					img_wins['l73'] = rolos['l7']
+					valor_ganho += 3 * imagens[rolos['l7']]
+					wins['l73'] = valor_ganho
+
+		if rolos['l2'] == rolos['l5']:
+			if rolos['l2'] == rolos['l8']:
+				if rolos['l2'] == rolos['l11']:
+					if rolos['l2'] == rolos['l14']:
+						img_wins['l225'] = rolos['l2']
+						valor_ganho += 3 * imagens[rolos['l2']]
+						wins['l225'] = valor_ganho
+					else:
+						img_wins['l224'] = rolos['l2']
+						valor_ganho += 3 * imagens[rolos['l2']]
+						wins['l224'] = valor_ganho
+				else:
+					img_wins['l23'] = rolos['l2']
+					valor_ganho += 3 * imagens[rolos['l2']]
+					wins['l23'] = valor_ganho
+
+		if rolos['l8'] == rolos['l11']:
+			if rolos['l8'] == rolos['l14']:
+				if rolos['l8'] == rolos['l5']:
+					if rolos['l8'] == rolos['l2']:
+						img_wins['l85'] = rolos['l8']
+						valor_ganho += 3 * imagens[rolos['l8']]
+						wins['l85'] = valor_ganho
+					else:
+						img_wins['l84'] = rolos['l8']
+						valor_ganho += 3 * imagens[rolos['l8']]
+						wins['l84'] = valor_ganho
+				else:
+					img_wins['l83'] = rolos['l8']
+					valor_ganho += 3 * imagens[rolos['l8']]
+					wins['l83'] = valor_ganho
+
+
+		if rolos['l3'] == rolos['l6']:
+			if rolos['l3'] == rolos['l9']:
+				if rolos['l3'] == rolos['l12']:
+					if rolos['l3'] == rolos['l15']:
+						img_wins['l335'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['l335'] = valor_ganho
+					else:
+						img_wins['l334'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['l334'] = valor_ganho
+				else:
+					img_wins['l33'] = rolos['l3']
+					valor_ganho += 3 * imagens[rolos['l3']]
+					wins['l33'] = valor_ganho
+
+
+		if rolos['l9'] == rolos['l12']:
+			if rolos['l9'] == rolos['l15']:
+				if rolos['l9'] == rolos['l6']:
+					if rolos['l9'] == rolos['l3']:
+						img_wins['l95'] = rolos['l9']
+						valor_ganho += 3 * imagens[rolos['l9']]
+						wins['l95'] = valor_ganho
+					else:
+						img_wins['l94'] = rolos['l9']
+						valor_ganho += 3 * imagens[rolos['l9']]
+						wins['l94'] = valor_ganho
+				else:
+					img_wins['l93'] = rolos['l9']
+					valor_ganho += 3 * imagens[rolos['l9']]
+					wins['l93'] = valor_ganho
+
+		#Premio diagonal esquera pra direita
+		if rolos['l1'] == rolos['l5']:
+			if rolos['l1'] == rolos['l9']:
+				img_wins['l12'] = rolos['l1']
+				valor_ganho += 3 * imagens[rolos['l1']]
+				wins['l12'] = valor_ganho
+
+		if rolos['l4'] == rolos['l8']:
+			if rolos['l4'] == rolos['l12']:
+				img_wins['l13'] = rolos['l4']
+				valor_ganho += 3 * imagens[rolos['l4']]
+				wins['l13'] = valor_ganho
+
+		if rolos['l7'] == rolos['l11']:
+			if rolos['l7'] == rolos['l15']:
+				img_wins['l17'] = rolos['l7']
+				valor_ganho += 3 * imagens[rolos['l7']]
+				wins['l17'] = valor_ganho
+
+		#Premio diagonal direita para esquerda
+		if rolos['l13'] == rolos['l11']:
+			if rolos['l13'] == rolos['l9']:
+				img_wins['l18'] = rolos['l13']
+				valor_ganho += 3 * imagens[rolos['l13']]
+				wins['l18'] = valor_ganho
+
+		if rolos['l10'] == rolos['l8']:
+			if rolos['l10'] == rolos['l6']:
+				img_wins['l19'] = rolos['l10']
+				valor_ganho += 3 * imagens[rolos['l10']]
+				wins['l19'] = valor_ganho
+
+		if rolos['l7'] == rolos['l5']:
+			if rolos['l7'] == rolos['l3']:
+				img_wins['l20'] = rolos['l7']
+				valor_ganho += 3 * imagens[rolos['l7']]
+				wins['l20'] = valor_ganho
+
+		#premiação em V
+		if rolos['l6'] == rolos['l8']:
+			if rolos['l6'] == rolos['l2']:
+					img_wins['073'] = rolos['l6']
+					valor_ganho += 3 * imagens[rolos['l6']]
+					wins['073'] = valor_ganho
+
+		if rolos['l9'] == rolos['l11']:
+			if rolos['l9'] == rolos['l5']:
+					img_wins['083'] = rolos['l9']
+					valor_ganho += 3 * imagens[rolos['l9']]
+					wins['083'] = valor_ganho
+
+		if rolos['l12'] == rolos['l14']:
+			if rolos['l12'] == rolos['l8']:
+					img_wins['093'] = rolos['l12']
+					valor_ganho += 3 * imagens[rolos['l12']]
+					wins['093'] = valor_ganho
+
+		if rolos['l4'] == rolos['l2']:
+			if rolos['l4'] == rolos['l8']:
+					img_wins['0103'] = rolos['l4']
+					valor_ganho += 3 * imagens[rolos['l4']]
+					wins['0103'] = valor_ganho
+
+		if rolos['l7'] == rolos['l5']:
+			if rolos['l7'] == rolos['l11']:
+					img_wins['0113'] = rolos['l7']
+					valor_ganho += 3 * imagens[rolos['l7']]
+					wins['0113'] = valor_ganho
+
+		if rolos['l10'] == rolos['l8']:
+			if rolos['l10'] == rolos['l14']:
+					img_wins['0123'] = rolos['l10']
+					valor_ganho += 3 * imagens[rolos['l10']]
+					wins['0123'] = valor_ganho
+
+
+
+
+		return wins, bonus, valor_ganho, img_wins
+
+	def linha9(self, rolos, val):
+		imagens = {'01.jpg': 500,'02.jpg': 300, '03.jpg': 25, '04.jpg': 20, '05.jpg': 7, '06.jpg': 6, '07.jpg': 5,
+										   '08.jpg': 4, '09.jpg': 3, '10.jpg': 2 }
+
+		valor_ganho = (5 * val / 100)
+		bonus = ''
+		wins = {}
+		img_wins = {}
+		#Premio vertical por coluna
+		if rolos['l1'] == rolos['l2']:
+			if rolos['l1'] == rolos['l3']:
+				img_wins['l1'] = rolos['l1']
+				valor_ganho += 3 * imagens[rolos['l1']]
+				wins['l1'] = valor_ganho
+				if rolos['l1'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l1'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l1'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l4'] == rolos['l5']:
+			if rolos['l4'] == rolos['l6']:
+				img_wins['l4'] = rolos['l6']
+				valor_ganho += 3 * imagens[rolos['l4']]
+				wins['l4'] = valor_ganho
+				if rolos['l4'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l4'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l4'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l7'] == rolos['l8']:
+			if rolos['l7'] == rolos['l9']:
+				img_wins['l7'] = rolos['l7']
+				valor_ganho += 3 * imagens[rolos['l7']]
+				wins['l7'] = valor_ganho
+				if rolos['l7'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l7'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l7'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l10'] == rolos['l11']:
+			if rolos['l10'] == rolos['l12']:
+				img_wins['l10'] = rolos['l10']
+				valor_ganho += 3 * imagens[rolos['l10']]
+				wins['l10'] = valor_ganho
+				if rolos['l10'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l10'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l10'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l13'] == rolos['l14']:
+			if rolos['l13'] == rolos['l15']:
+				img_wins['l15'] = rolos['l13']
+				valor_ganho += 3 * imagens[rolos['l13']]
+				wins['l15'] = valor_ganho
+				if rolos['l13'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l13'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l13'] == '05.jpg':
+					bonus = 'redbull'
+
+		#Premio horizontal por linha
+		if rolos['l1'] == rolos['l4']:
+			if rolos['l1'] == rolos['l7']:
+				if rolos['l1'] == rolos['l10']:
+					if rolos['l1'] == rolos['l13']:
+						img_wins['l65'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['l65'] = valor_ganho
+					else:
+						img_wins['l64'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['l64'] = valor_ganho
+				else:
+					img_wins['l63'] = rolos['l1']
+					valor_ganho += 3 * imagens[rolos['l1']]
+					wins['l63'] = valor_ganho
+
+		if rolos['l7'] == rolos['l10']:
+			if rolos['l7'] == rolos['l13']:
+				if rolos['l7'] == rolos['l4']:
+					if rolos['l7'] == rolos['l1']:
+						img_wins['l75'] = rolos['l7']
+						valor_ganho += 3 * imagens[rolos['l7']]
+						wins['l75'] = valor_ganho
+					else:
+						img_wins['l74'] = rolos['l7']
+						valor_ganho += 3 * imagens[rolos['l7']]
+						wins['l74'] = valor_ganho
+				else:
+					img_wins['l73'] = rolos['l7']
+					valor_ganho += 3 * imagens[rolos['l7']]
+					wins['l73'] = valor_ganho
+
+		if rolos['l2'] == rolos['l5']:
+			if rolos['l2'] == rolos['l8']:
+				if rolos['l2'] == rolos['l11']:
+					if rolos['l2'] == rolos['l14']:
+						img_wins['l225'] = rolos['l2']
+						valor_ganho += 3 * imagens[rolos['l2']]
+						wins['l225'] = valor_ganho
+					else:
+						img_wins['l224'] = rolos['l2']
+						valor_ganho += 3 * imagens[rolos['l2']]
+						wins['l224'] = valor_ganho
+				else:
+					img_wins['l23'] = rolos['l2']
+					valor_ganho += 3 * imagens[rolos['l2']]
+					wins['l23'] = valor_ganho
+
+		if rolos['l8'] == rolos['l11']:
+			if rolos['l8'] == rolos['l14']:
+				if rolos['l8'] == rolos['l5']:
+					if rolos['l8'] == rolos['l2']:
+						img_wins['l85'] = rolos['l8']
+						valor_ganho += 3 * imagens[rolos['l8']]
+						wins['l85'] = valor_ganho
+					else:
+						img_wins['l84'] = rolos['l8']
+						valor_ganho += 3 * imagens[rolos['l8']]
+						wins['l84'] = valor_ganho
+				else:
+					img_wins['l83'] = rolos['l8']
+					valor_ganho += 3 * imagens[rolos['l8']]
+					wins['l83'] = valor_ganho
+
+
+		if rolos['l3'] == rolos['l6']:
+			if rolos['l3'] == rolos['l9']:
+				if rolos['l3'] == rolos['l12']:
+					if rolos['l3'] == rolos['l15']:
+						img_wins['l335'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['l335'] = valor_ganho
+					else:
+						img_wins['l334'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['l334'] = valor_ganho
+				else:
+					img_wins['l33'] = rolos['l3']
+					valor_ganho += 3 * imagens[rolos['l3']]
+					wins['l33'] = valor_ganho
+
+
+		if rolos['l9'] == rolos['l12']:
+			if rolos['l9'] == rolos['l15']:
+				if rolos['l9'] == rolos['l6']:
+					if rolos['l9'] == rolos['l3']:
+						img_wins['l95'] = rolos['l9']
+						valor_ganho += 3 * imagens[rolos['l9']]
+						wins['l95'] = valor_ganho
+					else:
+						img_wins['l94'] = rolos['l9']
+						valor_ganho += 3 * imagens[rolos['l9']]
+						wins['l94'] = valor_ganho
+				else:
+					img_wins['l93'] = rolos['l9']
+					valor_ganho += 3 * imagens[rolos['l9']]
+					wins['l93'] = valor_ganho
+
+		#Premio diagonal esquera pra direita
+		if rolos['l1'] == rolos['l5']:
+			if rolos['l1'] == rolos['l9']:
+				img_wins['l12'] = rolos['l1']
+				valor_ganho += 3 * imagens[rolos['l1']]
+				wins['l12'] = valor_ganho
+
+		if rolos['l4'] == rolos['l8']:
+			if rolos['l4'] == rolos['l12']:
+				img_wins['l13'] = rolos['l4']
+				valor_ganho += 3 * imagens[rolos['l4']]
+				wins['l13'] = valor_ganho
+
+		if rolos['l7'] == rolos['l11']:
+			if rolos['l7'] == rolos['l15']:
+				img_wins['l17'] = rolos['l7']
+				valor_ganho += 3 * imagens[rolos['l7']]
+				wins['l17'] = valor_ganho
+
+		#Premio diagonal direita para esquerda
+		if rolos['l13'] == rolos['l11']:
+			if rolos['l13'] == rolos['l9']:
+				img_wins['l18'] = rolos['l13']
+				valor_ganho += 3 * imagens[rolos['l13']]
+				wins['l18'] = valor_ganho
+
+		if rolos['l10'] == rolos['l8']:
+			if rolos['l10'] == rolos['l6']:
+				img_wins['l19'] = rolos['l10']
+				valor_ganho += 3 * imagens[rolos['l10']]
+				wins['l19'] = valor_ganho
+
+		if rolos['l7'] == rolos['l5']:
+			if rolos['l7'] == rolos['l3']:
+				img_wins['l20'] = rolos['l7']
+				valor_ganho += 3 * imagens[rolos['l7']]
+				wins['l20'] = valor_ganho
+
+		#Premiaçao em X
+		if rolos['l1'] == rolos['l4']:
+			if rolos['l1'] == rolos['l8']:
+				if rolos['l1'] == rolos['l12']:
+					if rolos['l1'] == rolos['l15']:
+						img_wins['015'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['015'] = valor_ganho
+
+					else:
+						img_wins['014'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['014'] = valor_ganho
+				else:
+					img_wins['013'] = rolos['l1']
+					valor_ganho += 3 * imagens[rolos['l1']]
+					wins['013'] = valor_ganho
+
+		if rolos['l15'] == rolos['l12']:
+			if rolos['l15'] == rolos['l8']:
+				if rolos['l15'] == rolos['l4']:
+					if rolos['l15'] == rolos['l1']:
+						img_wins['025'] = rolos['l15']
+						valor_ganho += 3 * imagens[rolos['l15']]
+						wins['025'] = valor_ganho
+
+					else:
+						img_wins['024'] = rolos['l15']
+						valor_ganho += 3 * imagens[rolos['l15']]
+						wins['024'] = valor_ganho
+				else:
+					img_wins['023'] = rolos['l15']
+					valor_ganho += 3 * imagens[rolos['l15']]
+					wins['023'] = valor_ganho
+
+		if rolos['l3'] == rolos['l6']:
+			if rolos['l3'] == rolos['l8']:
+				if rolos['l3'] == rolos['l10']:
+					if rolos['l3'] == rolos['l13']:
+						img_wins['035'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['035'] = valor_ganho
+
+					else:
+						img_wins['034'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['034'] = valor_ganho
+				else:
+					img_wins['033'] = rolos['l3']
+					valor_ganho += 3 * imagens[rolos['l3']]
+					wins['033'] = valor_ganho
+
+		if rolos['l13'] == rolos['l10']:
+			if rolos['l13'] == rolos['l8']:
+				if rolos['l13'] == rolos['l6']:
+					if rolos['l13'] == rolos['l13']:
+						img_wins['045'] = rolos['l13']
+						valor_ganho += 3 * imagens[rolos['l13']]
+						wins['045'] = valor_ganho
+
+					else:
+						img_wins['044'] = rolos['l13']
+						valor_ganho += 3 * imagens[rolos['l13']]
+						wins['044'] = valor_ganho
+				else:
+					img_wins['043'] = rolos['l13']
+					valor_ganho += 3 * imagens[rolos['l13']]
+					wins['043'] = valor_ganho
+
+		#Premiaçao em piramide
+		if rolos['l1'] == rolos['l5']:
+			if rolos['l1'] == rolos['l9']:
+				if rolos['l1'] == rolos['l11']:
+					if rolos['l1'] == rolos['l13']:
+						img_wins['055'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['055'] = valor_ganho
+
+					else:
+						img_wins['054'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['054'] = valor_ganho
+
+		if rolos['l3'] == rolos['l5']:
+			if rolos['l3'] == rolos['l7']:
+				if rolos['l3'] == rolos['l11']:
+					if rolos['l3'] == rolos['l15']:
+						img_wins['065'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['065'] = valor_ganho
+
+					else:
+						img_wins['064'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['064'] = valor_ganho
+
+
+
+
+		return wins, bonus, valor_ganho, img_wins
+
+	def linha5(self, rolos, val):
+		imagens = {'01.jpg': 500,'02.jpg': 300, '03.jpg': 25, '04.jpg': 20, '05.jpg': 3, '06.jpg': 2, '07.jpg': 1,
+										   '08.jpg': 1, '09.jpg': 1, '10.jpg': 1 }
+
+		valor_ganho = (2 * val / 100)
+		bonus = ''
+		wins = {}
+		img_wins = {}
+		#Premio vertical por coluna
+		if rolos['l1'] == rolos['l2']:
+			if rolos['l1'] == rolos['l3']:
+				img_wins['l1'] = rolos['l1']
+				valor_ganho += 3 * imagens[rolos['l1']]
+				wins['l1'] = valor_ganho
+				if rolos['l1'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l1'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l1'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l4'] == rolos['l5']:
+			if rolos['l4'] == rolos['l6']:
+				img_wins['l4'] = rolos['l6']
+				valor_ganho += 3 * imagens[rolos['l4']]
+				wins['l4'] = valor_ganho
+				if rolos['l4'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l4'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l4'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l7'] == rolos['l8']:
+			if rolos['l7'] == rolos['l9']:
+				img_wins['l7'] = rolos['l7']
+				valor_ganho += 3 * imagens[rolos['l7']]
+				wins['l7'] = valor_ganho
+				if rolos['l7'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l7'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l7'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l10'] == rolos['l11']:
+			if rolos['l10'] == rolos['l12']:
+				img_wins['l10'] = rolos['l10']
+				valor_ganho += 3 * imagens[rolos['l10']]
+				wins['l10'] = valor_ganho
+				if rolos['l10'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l10'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l10'] == '05.jpg':
+					bonus = 'redbull'
+
+		if rolos['l13'] == rolos['l14']:
+			if rolos['l13'] == rolos['l15']:
+				img_wins['l15'] = rolos['l13']
+				valor_ganho += 3 * imagens[rolos['l13']]
+				wins['l15'] = valor_ganho
+				if rolos['l13'] == '09.jpg':
+					bonus = 'bruxa'
+				elif rolos['l13'] == '08.jpg':
+					bonus = 'sinuca'
+				elif rolos['l13'] == '05.jpg':
+					bonus = 'redbull'
+
+		#Premio horizontal por linha
+		if rolos['l1'] == rolos['l4']:
+			if rolos['l1'] == rolos['l7']:
+				if rolos['l1'] == rolos['l10']:
+					if rolos['l1'] == rolos['l13']:
+						img_wins['l65'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['l65'] = valor_ganho
+					else:
+						img_wins['l64'] = rolos['l1']
+						valor_ganho += 3 * imagens[rolos['l1']]
+						wins['l64'] = valor_ganho
+				else:
+					img_wins['l63'] = rolos['l1']
+					valor_ganho += 3 * imagens[rolos['l1']]
+					wins['l63'] = valor_ganho
+
+		if rolos['l7'] == rolos['l10']:
+			if rolos['l7'] == rolos['l13']:
+				if rolos['l7'] == rolos['l4']:
+					if rolos['l7'] == rolos['l1']:
+						img_wins['l75'] = rolos['l7']
+						valor_ganho += 3 * imagens[rolos['l7']]
+						wins['l75'] = valor_ganho
+					else:
+						img_wins['l74'] = rolos['l7']
+						valor_ganho += 3 * imagens[rolos['l7']]
+						wins['l74'] = valor_ganho
+				else:
+					img_wins['l73'] = rolos['l7']
+					valor_ganho += 3 * imagens[rolos['l7']]
+					wins['l73'] = valor_ganho
+
+		if rolos['l2'] == rolos['l5']:
+			if rolos['l2'] == rolos['l8']:
+				if rolos['l2'] == rolos['l11']:
+					if rolos['l2'] == rolos['l14']:
+						img_wins['l225'] = rolos['l2']
+						valor_ganho += 3 * imagens[rolos['l2']]
+						wins['l225'] = valor_ganho
+					else:
+						img_wins['l224'] = rolos['l2']
+						valor_ganho += 3 * imagens[rolos['l2']]
+						wins['l224'] = valor_ganho
+				else:
+					img_wins['l23'] = rolos['l2']
+					valor_ganho += 3 * imagens[rolos['l2']]
+					wins['l23'] = valor_ganho
+
+		if rolos['l8'] == rolos['l11']:
+			if rolos['l8'] == rolos['l14']:
+				if rolos['l8'] == rolos['l5']:
+					if rolos['l8'] == rolos['l2']:
+						img_wins['l85'] = rolos['l8']
+						valor_ganho += 3 * imagens[rolos['l8']]
+						wins['l85'] = valor_ganho
+					else:
+						img_wins['l84'] = rolos['l8']
+						valor_ganho += 3 * imagens[rolos['l8']]
+						wins['l84'] = valor_ganho
+				else:
+					img_wins['l83'] = rolos['l8']
+					valor_ganho += 3 * imagens[rolos['l8']]
+					wins['l83'] = valor_ganho
+
+
+		if rolos['l3'] == rolos['l6']:
+			if rolos['l3'] == rolos['l9']:
+				if rolos['l3'] == rolos['l12']:
+					if rolos['l3'] == rolos['l15']:
+						img_wins['l335'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['l335'] = valor_ganho
+					else:
+						img_wins['l334'] = rolos['l3']
+						valor_ganho += 3 * imagens[rolos['l3']]
+						wins['l334'] = valor_ganho
+				else:
+					img_wins['l33'] = rolos['l3']
+					valor_ganho += 3 * imagens[rolos['l3']]
+					wins['l33'] = valor_ganho
+
+
+		if rolos['l9'] == rolos['l12']:
+			if rolos['l9'] == rolos['l15']:
+				if rolos['l9'] == rolos['l6']:
+					if rolos['l9'] == rolos['l3']:
+						img_wins['l95'] = rolos['l9']
+						valor_ganho += 3 * imagens[rolos['l9']]
+						wins['l95'] = valor_ganho
+					else:
+						img_wins['l94'] = rolos['l9']
+						valor_ganho += 3 * imagens[rolos['l9']]
+						wins['l94'] = valor_ganho
+				else:
+					img_wins['l93'] = rolos['l9']
+					valor_ganho += 3 * imagens[rolos['l9']]
+					wins['l93'] = valor_ganho
+
+
+		return wins, bonus, valor_ganho, img_wins
+
+	def linha1(self, rolos, val):
+		imagens = {'01.jpg': 500,'02.jpg': 300, '03.jpg': 25, '04.jpg': 20, '05.jpg': 1, '06.jpg': 1, '07.jpg': 1,
+										   '08.jpg': 1, '09.jpg': 1, '10.jpg': 1 }
+
+		valor_ganho = 0
+		bonus = ''
+		wins = {}
+		img_wins = {}
+
+		if rolos['l2'] == rolos['l5']:
+			if rolos['l2'] == rolos['l8']:
+				if rolos['l2'] == rolos['l11']:
+					if rolos['l2'] == rolos['l14']:
+						img_wins['l225'] = rolos['l2']
+						valor_ganho += 3 * imagens[rolos['l2']]
+						wins['l225'] = valor_ganho
+					else:
+						img_wins['l224'] = rolos['l2']
+						valor_ganho += 3 * imagens[rolos['l2']]
+						wins['l224'] = valor_ganho
+				else:
+					img_wins['l23'] = rolos['l2']
+					valor_ganho += 3 * imagens[rolos['l2']]
+					wins['l23'] = valor_ganho
+
+		if rolos['l8'] == rolos['l11']:
+			if rolos['l8'] == rolos['l14']:
+				if rolos['l8'] == rolos['l5']:
+					if rolos['l8'] == rolos['l2']:
+						img_wins['l85'] = rolos['l8']
+						valor_ganho += 3 * imagens[rolos['l8']]
+						wins['l85'] = valor_ganho
+					else:
+						img_wins['l84'] = rolos['l8']
+						valor_ganho += 3 * imagens[rolos['l8']]
+						wins['l84'] = valor_ganho
+				else:
+					img_wins['l83'] = rolos['l8']
+					valor_ganho += 3 * imagens[rolos['l8']]
+					wins['l83'] = valor_ganho
+
+		return wins, bonus, valor_ganho, img_wins
+
+	def deposito(self, vlr):
+		data = self.banco
+		relogio = str(datetime.datetime.now()).split('.')[0]
+		hora = relogio
+		var = "INSERT INTO deposito (id, dp, data) VALUES (DEFAULT, '%s', '%s');" % (vlr, hora)
+		grava = data.cursor()
+		grava.execute(var)
+		data.commit()
 
 if __name__ == '__main__':
-                Jogo().main()
+	Jogo().main()
