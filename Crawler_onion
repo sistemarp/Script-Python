@@ -1,0 +1,58 @@
+import requests
+from bs4 import BeautifulSoup
+
+def extract(content):
+    soup = BeautifulSoup(content)
+    tag = soup.find('title', text=True)
+
+    if not tag:
+        return None
+
+    return tag.string.strip()
+
+def extract_link(content):
+    soup = BeautifulSoup(content)
+    link = set()
+
+    for tag in soup.find_all('a', href=True):
+        if tag['href'].startswith('http') or tag['href'].startswith('www'):
+            link.add(tag['href'])
+
+    return link
+
+def craw(start_url):
+    global search
+    url_vista = set([start_url])
+    url_nao_vista = set([start_url])
+    
+    session = requests.session()
+    session.proxies = {'http':  'socks5h://127.0.0.1:9150',
+                   'https': 'socks5h://127.0.0.1:9150'}
+    
+    while url_nao_vista:
+        url = url_nao_vista.pop()
+        try:
+            content = session.get(url)
+            if content.status_code == 200:
+                title = extract(content.text)
+                print(title)
+                print(url)
+                print()
+                with open('links.txt', 'a') as doc:
+                    doc.write('Title: %s\nLink: %s\n'%(title, url))
+        except Exception as error:
+            print('Deu Error!', error)
+            
+        for link in extract_link(content.text):
+            if link not in url_vista:
+                url_nao_vista.add(link)
+            else:
+                url_vista.add(link)
+
+try:
+    alvo = str(input('CRAWLER: '))
+    craw(alvo)
+except KeyboardInterrupt:
+    print()
+    print('Bye')
+
