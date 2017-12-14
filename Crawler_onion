@@ -44,6 +44,7 @@ def craw(start_url):
                     
         except Exception as error:
             print('Tempo limite de conexão expirada! Tentando novamente.')
+            print('#################################################\n\n')
             url_vista.add(url)
 
         try:
@@ -55,6 +56,7 @@ def craw(start_url):
                     url_vista.add(link)
         except Exception as error:
             print('Verifique se o Tor Browser esta aberto e tente novamente!')
+            main()
             
 def main():
     try:
