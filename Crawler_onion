@@ -13,11 +13,10 @@ def extract(content):
 def extract_link(content):
     soup = BeautifulSoup(content)
     link = set()
-
+    
     for tag in soup.find_all('a', href=True):
-        if tag['href'].startswith('http') or tag['href'].startswith('www'):
+        if '.onion' in tag['href']:
             link.add(tag['href'])
-
     return link
 
 def craw(start_url):
@@ -32,22 +31,24 @@ def craw(start_url):
     while url_nao_vista:
         url = url_nao_vista.pop()
         try:
-            content = session.get(url)
+            content = session.get(url, timeout=50)
             if content.status_code == 200:
                 title = extract(content.text)
                 print(title)
                 print(url)
-                print()
+                print()                        
                 with open('links.txt', 'a') as doc:
                     doc.write('Title: %s\nLink: %s\n'%(title, url))
+                    
         except Exception as error:
-            print('Deu Error!', error)
+            print('Tempo limite de conexão expirada! Tentando novamente.')
             
         for link in extract_link(content.text):
             if link not in url_vista:
                 url_nao_vista.add(link)
             else:
                 url_vista.add(link)
+            
 
 try:
     alvo = str(input('CRAWLER: '))
