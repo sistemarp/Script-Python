@@ -45,18 +45,25 @@ def craw(start_url):
         except Exception as error:
             print('Tempo limite de conexão expirada! Tentando novamente.')
             url_vista.add(url)
-            
-        for link in extract_link(content.text):
-            if link not in url_vista:
-                url_nao_vista.add(link)
-            else:
-                url_vista.add(link)
-            
 
-try:
-    alvo = str(input('CRAWLER: '))
-    craw(alvo)
-except KeyboardInterrupt:
-    print()
-    print('Bye')
-
+        try:
+            
+            for link in extract_link(content.text):
+                if link not in url_vista:
+                    url_nao_vista.add(link)
+                else:
+                    url_vista.add(link)
+        except Exception as error:
+            print('Verifique se o Tor Browser esta aberto e tente novamente!')
+            
+def main():
+    try:
+        alvo = str(input('CRAWLER: '))
+        if alvo.startswith('http://'):
+            craw(alvo)
+        else:
+            craw('http://'+alvo)
+    except KeyboardInterrupt:
+        print()
+        print('Bye')
+main()
