@@ -23,6 +23,8 @@ def craw(start_url):
     global search
     url_vista = set([start_url])
     url_nao_vista = set([start_url])
+
+    print('#Verificando links:\n')
     
     session = requests.session()
     session.proxies = {'http':  'socks5h://127.0.0.1:9150',
@@ -42,6 +44,7 @@ def craw(start_url):
                     
         except Exception as error:
             print('Tempo limite de conexão expirada! Tentando novamente.')
+            url_vista.add(url)
             
         for link in extract_link(content.text):
             if link not in url_vista:
